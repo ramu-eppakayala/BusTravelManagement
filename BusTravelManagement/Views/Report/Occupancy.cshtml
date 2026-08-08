@@ -1,0 +1,27 @@
+@model BusTravelManagement.Models.ViewModels.OccupancyReportViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Occupancy Report - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .report-section { padding: 2rem 0; background: #f8f9fa; min-height: calc(100vh - 76px - 250px); }
+        .stat-card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 1.25rem; height: 100%; }
+        .stat-number { font-size: 1.75rem; font-weight: 800; color: #1a1a2e; }
+        .stat-label { color: #6c757d; font-size: 0.85rem; }
+    </style>
+}
+
+<div class="report-section">
+    <div class="container-fluid px-4">
+        <h4 class="fw-bold mb-4"><i class="fas fa-chart-line me-2"></i>Occupancy Report</h4>
+        <div class="row g-3 mb-4">
+            <div class="col-md-3"><div class="stat-card"><div class="stat-number">@Model.TotalSeats</div><div class="stat-label">Total Seats</div></div></div>
+            <div class="col-md-3"><div class="stat-card"><div class="stat-number">@Model.TotalSeatsSold</div><div class="stat-label">Booked Seats</div></div></div>
+            <div class="col-md-3"><div class="stat-card"><div class="stat-number">@Model.OverallOccupancyRate.ToString("N1")%</div><div class="stat-label">Occupancy Rate</div></div></div>
+            <div class="col-md-3"><div class="stat-card"><div class="stat-number">@Model.TotalTrips</div><div class="stat-label">Total Trips</div></div></div>
+        </div>
+        <p class="text-muted">Seat occupancy and utilization data loaded from the database.</p>
+    </div>
+</div>

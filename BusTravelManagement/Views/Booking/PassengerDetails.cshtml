@@ -1,0 +1,401 @@
+@using System.Linq
+@model BusTravelManagement.Models.ViewModels.ConfirmBookingViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Passenger Details - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .passenger-page {
+            background: #f8f9fa;
+            min-height: calc(100vh - 76px - 250px);
+        }
+        .section-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            margin-bottom: 1.5rem;
+        }
+        .section-card .card-header {
+            background: #fff;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 700;
+            padding: 1rem 1.5rem;
+            border-radius: 12px 12px 0 0 !important;
+            font-size: 1.05rem;
+        }
+        .section-card .card-body {
+            padding: 1.5rem;
+        }
+        .passenger-form .form-control,
+        .passenger-form .form-select {
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            transition: border-color 0.3s;
+        }
+        .passenger-form .form-control:focus,
+        .passenger-form .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: none;
+        }
+        .passenger-form .form-control.is-invalid {
+            border-color: #dc3545;
+        }
+        .passenger-header {
+            background: linear-gradient(135deg, #1a1a2e, #0f3460);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            color: #fff;
+            margin-bottom: 1rem;
+        }
+        .passenger-header .seat-badge {
+            background: rgba(255,255,255,0.15);
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        .coupon-section .input-group {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .coupon-section .form-control {
+            border: 2px solid #e9ecef;
+            padding: 0.6rem 1rem;
+        }
+        .coupon-section .btn-apply {
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+        }
+        .coupon-message {
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+        .coupon-message.success { color: #198754; }
+        .coupon-message.error { color: #dc3545; }
+        .fare-summary-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            padding: 1.5rem;
+            position: sticky;
+            top: 90px;
+        }
+        .fare-summary-card h6 {
+            font-weight: 700;
+            color: #1a1a2e;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 0.75rem;
+        }
+        .fare-summary-card .fare-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .fare-summary-card .fare-row.total {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #1a1a2e;
+            border-top: 2px solid #e9ecef;
+            padding-top: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        .fare-summary-card .fare-row.discount {
+            color: #198754;
+        }
+        .btn-proceed {
+            padding: 0.75rem;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+        .contact-section {
+            background: #f0f7ff;
+            border-radius: 10px;
+            padding: 1.25rem;
+        }
+        .passenger-card {
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            background: #fff;
+        }
+        .passenger-card .passenger-title {
+            font-weight: 600;
+            color: #0d6efd;
+            margin-bottom: 1rem;
+        }
+        .special-request {
+            resize: vertical;
+            min-height: 80px;
+        }
+        @@media (max-width: 768px) {
+            .section-card .card-body { padding: 1rem; }
+        }
+    </style>
+}
+
+<div class="passenger-page py-4">
+    <div class="container">
+        <div class="row">
+            <!-- Main Form -->
+            <div class="col-lg-8">
+                @using (Html.BeginForm("PassengerDetails", "Booking", FormMethod.Post, new { role = "form" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <!-- Bus Info Summary -->
+                    <div class="passenger-header">
+                        <div class="row align-items-center">
+                            <div class="col-md-6 mb-2 mb-md-0">
+                                <strong><i class="fas fa-bus me-2"></i>@Model.OperatorName</strong>
+                                <span class="ms-2 opacity-75">@Model.BusNumber</span>
+                            </div>
+                            <div class="col-md-6 text-md-end">
+                                <span class="seat-badge">
+                                    <i class="fas fa-chair me-1"></i>@string.Join(", ", Model.SelectedSeats.Select(s => s.SeatNumber))
+                                </span>
+                                <span class="ms-2 seat-badge">
+                                    <i class="fas fa-route me-1"></i>@Model.SourceCity → @Model.DestinationCity
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Passenger Details -->
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-users me-2"></i>Passenger Details
+                            <small class="text-muted">(@Model.SelectedSeats.Count passenger(s))</small>
+                        </div>
+                        <div class="card-body">
+                            @for (int i = 0; i < Model.SelectedSeats.Count; i++)
+                            {
+                                <div class="passenger-card">
+                                    <div class="passenger-title">
+                                        <i class="fas fa-user me-1"></i>Passenger @(i + 1) - Seat @Model.SelectedSeats[i].SeatNumber
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-medium">Full Name</label>
+                                            <input type="text" name="Passengers[@i].Name" class="form-control" placeholder="Enter full name" required />
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label fw-medium">Age</label>
+                                            <input type="number" name="Passengers[@i].Age" class="form-control" placeholder="Age" min="1" max="120" required />
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label fw-medium">Gender</label>
+                                            <select name="Passengers[@i].Gender" class="form-select" required>
+                                                <option value="">Select</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-medium">ID Card Type</label>
+                                            <select name="Passengers[@i].IdCardType" class="form-select">
+                                                <option value="">-- Select --</option>
+                                                <option value="Aadhaar">Aadhaar Card</option>
+                                                <option value="PAN">PAN Card</option>
+                                                <option value="Driving License">Driving License</option>
+                                                <option value="Passport">Passport</option>
+                                                <option value="Voter ID">Voter ID</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-medium">ID Card Number</label>
+                                            <input type="text" name="Passengers[@i].IdCardNumber" class="form-control" placeholder="Enter ID number" />
+                                        </div>
+                                        <input type="hidden" name="Passengers[@i].SeatLayoutId" value="@Model.SelectedSeats[i].SeatLayoutId" />
+                                        <input type="hidden" name="Passengers[@i].SeatNumber" value="@Model.SelectedSeats[i].SeatNumber" />
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- Special Requests -->
+                            <div class="mb-3">
+                                <label class="form-label fw-medium">Special Requests</label>
+                                <textarea name="SpecialRequests" class="form-control special-request" placeholder="Any special requests (e.g., prefer lower berth, need assistance, etc.)"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Details -->
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-address-card me-2"></i>Contact Details
+                        </div>
+                        <div class="card-body">
+                            <div class="contact-section">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-medium">Contact Name</label>
+                                        <input type="text" name="ContactName" class="form-control" placeholder="Your name" value="@User.Identity.Name" required />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-medium">Phone Number</label>
+                                        <input type="tel" name="ContactPhone" class="form-control" placeholder="+91 9876543210" required />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-medium">Email</label>
+                                        <input type="email" name="ContactEmail" class="form-control" placeholder="you@example.com" required />
+                                    </div>
+                                </div>
+                                <small class="text-muted mt-2 d-block">
+                                    <i class="fas fa-info-circle me-1"></i>Tickets will be sent to this email and phone number.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Coupon Code -->
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-tag me-2"></i>Coupon Code
+                        </div>
+                        <div class="card-body">
+                            <div class="coupon-section">
+                                <div class="input-group">
+                                    <input type="text" name="CouponCode" id="couponCode" class="form-control" placeholder="Enter coupon code" />
+                                    <button type="button" class="btn btn-outline-primary btn-apply" id="applyCoupon">
+                                        APPLY
+                                    </button>
+                                </div>
+                                <div id="couponMessage" class="coupon-message"></div>
+                                <div id="discountDisplay" class="mt-2 d-none">
+                                    <span class="badge bg-success"><i class="fas fa-check me-1"></i>Discount applied: -₹<span id="discountAmount">0</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Fare Summary (visible on mobile) -->
+                    <div class="d-lg-none mb-3">
+                        <div class="fare-summary-card">
+                            <h6>Fare Summary</h6>
+                            <div class="fare-row">
+                                <span>Base Fare (@Model.SelectedSeats.Count × ₹@Model.BaseFare.ToString("N2"))</span>
+                                <span>₹@((Model.SelectedSeats.Count * Model.BaseFare).ToString("N2"))</span>
+                            </div>
+                            <div class="fare-row">
+                                <span>Convenience Fee</span>
+                                <span>₹@Model.ConvenienceFee.ToString("N2")</span>
+                            </div>
+                            <div class="fare-row">
+                                <span>GST</span>
+                                <span>₹@Model.Tax.ToString("N2")</span>
+                            </div>
+                            <div class="fare-row discount" id="discountRow" style="display:none;">
+                                <span>Discount</span>
+                                <span>-₹<span id="discountValue">0.00</span></span>
+                            </div>
+                            <div class="fare-row total">
+                                <span>Total</span>
+                                <span>₹@Model.TotalAmount.ToString("N2")</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-proceed w-100 d-lg-none mb-4">
+                        <i class="fas fa-credit-card me-2"></i>PROCEED TO PAYMENT
+                    </button>
+                }
+            </div>
+
+            <!-- Sidebar - Fare Summary -->
+            <div class="col-lg-4">
+                <div class="fare-summary-card d-none d-lg-block">
+                    <h6><i class="fas fa-receipt me-2"></i>Fare Summary</h6>
+                    <div class="fare-row">
+                        <span>Base Fare (@Model.SelectedSeats.Count × ₹@Model.BaseFare.ToString("N2"))</span>
+                        <span>₹@((Model.SelectedSeats.Count * Model.BaseFare).ToString("N2"))</span>
+                    </div>
+                    <div class="fare-row">
+                        <span>Convenience Fee</span>
+                        <span>₹@Model.ConvenienceFee.ToString("N2")</span>
+                    </div>
+                    <div class="fare-row">
+                        <span>GST</span>
+                        <span>₹@Model.Tax.ToString("N2")</span>
+                    </div>
+                    <div class="fare-row discount" id="discountRowDesktop" style="display:none;">
+                        <span>Discount</span>
+                        <span>-₹<span id="discountValueDesktop">0.00</span></span>
+                    </div>
+                    <div class="fare-row total">
+                        <span>Total</span>
+                        <span>₹@Model.TotalAmount.ToString("N2")</span>
+                    </div>
+                    <hr />
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span class="text-muted">Seats:</span>
+                        <span>@string.Join(", ", Model.SelectedSeats)</span>
+                    </div>
+                    <div class="d-flex justify-content-between small">
+                        <span class="text-muted">Boarding:</span>
+                        <span>@Model.BoardingPointName (@Model.BoardingPointTime)</span>
+                    </div>
+                    <div>
+                        @using (Html.BeginForm("PassengerDetails", "Booking", FormMethod.Post))
+                        {
+                            @Html.AntiForgeryToken()
+                            <!-- Hidden fields to pass data -->
+                            <button type="submit" class="btn btn-primary btn-proceed w-100 mt-3">
+                                <i class="fas fa-credit-card me-2"></i>PROCEED TO PAYMENT
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- validation loaded from CDN in layout -->
+    <script>
+        $(document).ready(function () {
+            // Coupon apply
+            $('#applyCoupon').on('click', function () {
+                var code = $('#couponCode').val().trim();
+                var msg = $('#couponMessage');
+                var discountDisplay = $('#discountDisplay');
+
+                if (!code) {
+                    msg.html('<i class="fas fa-exclamation-circle me-1"></i>Please enter a coupon code').removeClass('success').addClass('error');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/Booking/ValidateCoupon',
+                    type: 'GET',
+                    data: { code: code },
+                    success: function (response) {
+                        if (response.valid) {
+                            msg.html('<i class="fas fa-check-circle me-1"></i>' + response.message).removeClass('error').addClass('success');
+                            discountDisplay.removeClass('d-none');
+                            $('#discountAmount').text(response.discountAmount.toFixed(2));
+                            $('#discountRow').show();
+                            $('#discountValue').text(response.discountAmount.toFixed(2));
+                            $('#discountRowDesktop').show();
+                            $('#discountValueDesktop').text(response.discountAmount.toFixed(2));
+                        } else {
+                            msg.html('<i class="fas fa-times-circle me-1"></i>' + response.message).removeClass('success').addClass('error');
+                            discountDisplay.addClass('d-none');
+                            $('#discountRow').hide();
+                            $('#discountRowDesktop').hide();
+                        }
+                    },
+                    error: function () {
+                        msg.html('<i class="fas fa-exclamation-circle me-1"></i>Error validating coupon. Please try again.').removeClass('success').addClass('error');
+                    }
+                });
+            });
+        });
+    </script>
+}

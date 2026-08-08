@@ -1,0 +1,174 @@
+@using System.Linq
+@model IEnumerable<BusTravelManagement.Models.ViewModels.OperatorListViewModel>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Manage Operators - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .admin-page { background: #f8f9fa; min-height: calc(100vh - 76px - 250px); }
+        .operators-card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .operators-card .card-header { background: #fff; border-bottom: 1px solid #e9ecef; padding: 1rem 1.25rem; border-radius: 12px 12px 0 0 !important; }
+        .operators-card .card-body { padding: 0; }
+        .operators-table { font-size: 0.9rem; margin-bottom: 0; }
+        .operators-table th { background: #f8f9fa; font-weight: 600; color: #6c757d; font-size: 0.8rem; text-transform: uppercase; padding: 0.75rem 1rem; }
+        .operators-table td { padding: 0.75rem 1rem; vertical-align: middle; }
+        .company-info { display: flex; align-items: center; gap: 0.75rem; }
+        .company-info .logo { width: 40px; height: 40px; border-radius: 8px; object-fit: contain; background: #f8f9fa; }
+        .status-badge { font-size: 0.75rem; padding: 0.25rem 0.6rem; border-radius: 20px; font-weight: 600; }
+        .verified-badge { font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 4px; }
+        .action-btn { padding: 0.25rem 0.5rem; border-radius: 6px; }
+        .search-bar .form-control { border-radius: 8px; border: 2px solid #e9ecef; padding: 0.5rem 0.75rem; max-width: 300px; }
+        .search-bar .form-control:focus { border-color: #0d6efd; box-shadow: none; }
+        .modal-content { border: none; border-radius: 16px; }
+        .modal-header { border-bottom: 1px solid #e9ecef; }
+        @@media (max-width: 768px) { .operators-table { font-size: 0.8rem; } }
+    </style>
+}
+
+<div class="admin-page py-4">
+    <div class="container-fluid px-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0"><i class="fas fa-building me-2"></i>Manage Operators</h4>
+            <span class="text-muted small">@Model.Count() operators</span>
+        </div>
+
+        <div class="search-bar mb-3">
+            <input type="text" class="form-control" id="searchOperator" placeholder="Search by company name, city, contact..." />
+        </div>
+
+        <div class="card operators-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-list me-2"></i>Operators</span>
+                <button class="btn btn-primary btn-sm" onclick="alert('Add operator form')">
+                    <i class="fas fa-plus me-1"></i>Add Operator
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table operators-table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Contact</th>
+                            <th>City</th>
+                            <th>Buses</th>
+                            <th>Commission</th>
+                            <th>Status</th>
+                            <th>Verified</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var op in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="company-info">
+                                            <div class="logo d-flex align-items-center justify-content-center"><i class="fas fa-building text-secondary"></i></div>
+                                            <div>
+                                                <strong>@op.CompanyName</strong>
+                                                <small class="d-block text-muted">@op.ContactEmail</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>@op.ContactPerson</div>
+                                        <small class="text-muted">@op.ContactPhone</small>
+                                    </td>
+                                    <td>@op.City</td>
+                                    <td><strong>@op.BusCount</strong></td>
+                                    <td>@op.Commission%</td>
+                                    <td>
+                                        @if (op.IsActive)
+                                        {
+                                            <span class="status-badge bg-success bg-opacity-10 text-success">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-badge bg-danger bg-opacity-10 text-danger">Inactive</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (op.IsVerified)
+                                        {
+                                            <span class="verified-badge bg-success bg-opacity-10 text-success border border-success">
+                                                <i class="fas fa-check-circle me-1"></i>Verified
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="verified-badge bg-warning bg-opacity-10 text-warning border border-warning">
+                                                <i class="fas fa-clock me-1"></i>Pending
+                                            </span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            @if (!op.IsVerified)
+                                            {
+                                                <button class="btn btn-outline-success action-btn" onclick="approveOperator('@op.Id')" title="Approve">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            }
+                                            <a href="@Url.Action("Operator", "Report", new { operatorId = op.Id })" class="btn btn-outline-primary action-btn" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button class="btn btn-outline-@(op.IsActive ? "danger" : "success") action-btn" onclick="toggleOperator('@op.Id')" title="@(op.IsActive ? "Deactivate" : "Activate")">
+                                                <i class="fas fa-@(op.IsActive ? "ban" : "check")"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">No operators found</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function approveOperator(operatorId) {
+            if (confirm('Approve this operator?')) {
+                $.ajax({
+                    url: '/Admin/ApproveOperator',
+                    type: 'POST',
+                    data: { operatorId: operatorId },
+                    success: function () { location.reload(); }
+                });
+            }
+        }
+
+        function toggleOperator(operatorId) {
+            if (confirm('Toggle operator status?')) {
+                $.ajax({
+                    url: '/Admin/ToggleOperator',
+                    type: 'POST',
+                    data: { operatorId: operatorId },
+                    success: function () { location.reload(); }
+                });
+            }
+        }
+
+        $(document).ready(function () {
+            $('#searchOperator').on('keyup', function () {
+                var val = $(this).val().toLowerCase();
+                $('.operators-table tbody tr').each(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(val) > -1);
+                });
+            });
+        });
+    </script>
+}

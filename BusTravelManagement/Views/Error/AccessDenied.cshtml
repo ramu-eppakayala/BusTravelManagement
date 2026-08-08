@@ -1,0 +1,161 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "403 - Access Denied - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .denied-page {
+            min-height: calc(100vh - 76px - 250px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+        }
+        .denied-container {
+            text-align: center;
+            max-width: 550px;
+            padding: 2rem;
+        }
+        .denied-code {
+            font-size: 7rem;
+            font-weight: 900;
+            color: #e9ecef;
+            line-height: 1;
+            margin-bottom: 0;
+        }
+        .denied-icon {
+            margin: -1.5rem 0 1rem;
+        }
+        .denied-icon .icon-circle {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+            background: #fee2e2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: #dc3545;
+        }
+        .denied-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #1a1a2e;
+            margin-bottom: 0.75rem;
+        }
+        .denied-message {
+            color: #6c757d;
+            font-size: 1.05rem;
+            margin-bottom: 2rem;
+        }
+        .btn-home {
+            padding: 0.7rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        .access-info {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            text-align: left;
+        }
+        .access-info h6 {
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 1rem;
+        }
+        .access-info ul {
+            margin-bottom: 0;
+            padding-left: 1.25rem;
+        }
+        .access-info li {
+            margin-bottom: 0.5rem;
+        }
+        .access-info li:last-child {
+            margin-bottom: 0;
+        }
+        .access-info .role-badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: #e9ecef;
+            color: #495057;
+            margin-right: 0.25rem;
+        }
+    </style>
+}
+
+<div class="denied-page">
+    <div class="denied-container">
+        <div class="denied-code">403</div>
+        <div class="denied-icon">
+            <div class="icon-circle">
+                <i class="fas fa-lock"></i>
+            </div>
+        </div>
+        <h1 class="denied-title">Access Denied</h1>
+        <p class="denied-message">
+            You don't have permission to access this page. This area is restricted to authorized users only.
+        </p>
+
+        @if (User.Identity.IsAuthenticated)
+        {
+            <div class="access-info">
+                <h6><i class="fas fa-user me-2"></i>Account Information</h6>
+                <p class="mb-2"><strong>User:</strong> @User.Identity.Name</p>
+                <p class="mb-2"><strong>Required Access:</strong> @ViewBag.RequiredRole</p>
+                <p class="mb-2"><strong>Your Roles:</strong></p>
+                <div>
+                    @foreach (var role in System.Web.Security.Roles.GetRolesForUser())
+                    {
+                        <span class="role-badge">@role</span>
+                    }
+                </div>
+                <hr />
+                <h6>Need help?</h6>
+                <ul>
+                    <li>Contact your administrator to request access</li>
+                    <li>Try logging in with a different account</li>
+                    <li>Contact our support team for assistance</li>
+                </ul>
+            </div>
+        }
+        else
+        {
+            <div class="access-info">
+                <h6><i class="fas fa-info-circle me-2 text-info"></i>Not Signed In?</h6>
+                <p class="mb-0">You may need to sign in with an account that has the required permissions to access this page.</p>
+            </div>
+        }
+
+        <div class="d-flex gap-3 justify-content-center mt-4">
+            <a href="/" class="btn btn-primary btn-home">
+                <i class="fas fa-home me-2"></i>Go to Home
+            </a>
+            @if (!User.Identity.IsAuthenticated)
+            {
+                <a href="/Account/Login" class="btn btn-outline-primary btn-home">
+                    <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                </a>
+            }
+            <a href="javascript:history.back()" class="btn btn-outline-secondary btn-home">
+                <i class="fas fa-arrow-left me-2"></i>Go Back
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @if (!User.Identity.IsAuthenticated)
+    {
+        <script>
+            console.log('Access denied - user not authenticated');
+        </script>
+    }
+}

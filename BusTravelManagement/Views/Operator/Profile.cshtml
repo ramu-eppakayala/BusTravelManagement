@@ -1,0 +1,89 @@
+@model BusTravelManagement.Models.ViewModels.OperatorProfileViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Operator Profile - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .profile-section { padding: 2rem 0; background: #f8f9fa; min-height: calc(100vh - 76px - 250px); }
+        .profile-card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .profile-card .card-header { background: linear-gradient(135deg, #1a1a2e, #0f3460); color: #fff; border-radius: 12px 12px 0 0 !important; padding: 1.25rem 1.5rem; }
+        .profile-card .card-body { padding: 2rem; }
+        .profile-card .form-label { font-weight: 600; }
+        .profile-card .form-control { padding: 0.6rem 1rem; border-radius: 8px; border: 2px solid #e9ecef; }
+        .profile-card .form-control:focus { border-color: #0d6efd; box-shadow: none; }
+        .btn-submit { padding: 0.6rem 2rem; border-radius: 8px; font-weight: 600; }
+    </style>
+}
+
+<div class="profile-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card profile-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-user-circle me-2"></i>Operator Profile</h5>
+                    </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm("Profile", "Operator", FormMethod.Post, new { role = "form" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    @Html.LabelFor(m => m.CompanyName, new { @class = "form-label" })
+                                    @Html.TextBoxFor(m => m.CompanyName, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.CompanyName, "", new { @class = "text-danger small" })
+                                </div>
+                                <div class="col-md-6">
+                                    @Html.LabelFor(m => m.CompanyRegistrationNumber, new { @class = "form-label" })
+                                    @Html.TextBoxFor(m => m.CompanyRegistrationNumber, new { @class = "form-control" })
+                                </div>
+                                <div class="col-md-6">
+                                    @Html.LabelFor(m => m.ContactPerson, new { @class = "form-label" })
+                                    @Html.TextBoxFor(m => m.ContactPerson, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.ContactPerson, "", new { @class = "text-danger small" })
+                                </div>
+                                <div class="col-md-6">
+                                    @Html.LabelFor(m => m.ContactEmail, new { @class = "form-label" })
+                                    @Html.TextBoxFor(m => m.ContactEmail, new { @class = "form-control", type = "email" })
+                                </div>
+                                <div class="col-md-6">
+                                    @Html.LabelFor(m => m.ContactPhone, new { @class = "form-label" })
+                                    @Html.TextBoxFor(m => m.ContactPhone, new { @class = "form-control" })
+                                </div>
+                                <div class="col-md-6">
+                                    @Html.LabelFor(m => m.WebsiteUrl, new { @class = "form-label" })
+                                    @Html.TextBoxFor(m => m.WebsiteUrl, new { @class = "form-control", placeholder = "https://" })
+                                </div>
+                                <div class="col-12">
+                                    @Html.LabelFor(m => m.Address, new { @class = "form-label" })
+                                    @Html.TextAreaFor(m => m.Address, new { @class = "form-control", rows = 3 })
+                                </div>
+                                <div class="col-md-4">
+                                    @Html.LabelFor(m => m.City, new { @class = "form-label" })
+                                    @Html.TextBoxFor(m => m.City, new { @class = "form-control" })
+                                </div>
+                                <div class="col-md-4">
+                                    @Html.LabelFor(m => m.State, new { @class = "form-label" })
+                                    @Html.TextBoxFor(m => m.State, new { @class = "form-control" })
+                                </div>
+                                <div class="col-md-4">
+                                    @Html.LabelFor(m => m.PostalCode, new { @class = "form-label" })
+                                    @Html.TextBoxFor(m => m.PostalCode, new { @class = "form-control" })
+                                </div>
+                            </div>
+
+                            <div class="mt-4 text-end">
+                                <a href="@Url.Action("Dashboard", "Operator")" class="btn btn-outline-secondary btn-submit me-2">Cancel</a>
+                                <button type="submit" class="btn btn-primary btn-submit"><i class="fas fa-save me-2"></i>Update Profile</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

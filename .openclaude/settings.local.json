@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(head -50 D:OpenclaudeTravelsBusTravelManagementLogs/*.log)",
+      "Bash(grep -l \"AntiXsrf\\\\|AntiForgery\\\\|GenerateFormToken\\\\|ClaimUid\\\\|InvalidOperationException\" \"D:\\\\Openclaude\\\\Travels\\\\BusTravelManagement\\\\Logs\"/*.log)",
+      "Bash(grep -c \"InvalidOperationException\" \"D:\\\\Openclaude\\\\Travels\\\\BusTravelManagement\\\\Logs\"/*.log)",
+      "Read(//c/Program Files/Microsoft Visual Studio/**)",
+      "Read(//c/Program Files \\(x86\\)/Microsoft Visual Studio/**)",
+      "Bash(where msbuild:*)",
+      "Read(//c/Program Files/Microsoft Visual Studio/2022/**)",
+      "Bash(\"/c/Program Files/Microsoft Visual Studio/2022/Professional/MSBuild/Current/Bin/amd64/MSBuild.exe\" BusTravelManagement.sln /t:Build /p:Configuration=Debug /v:minimal /nologo)",
+      "Bash(MSYS_NO_PATHCONV=1 \"/c/Program Files/Microsoft Visual Studio/2022/Professional/MSBuild/Current/Bin/amd64/MSBuild.exe\" BusTravelManagement.sln -t:Build -p:Configuration=Debug -v:minimal -nologo)"
+    ]
+  }
+}

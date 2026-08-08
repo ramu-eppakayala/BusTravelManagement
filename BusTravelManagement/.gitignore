@@ -1,0 +1,64 @@
+## BusTravel Management System
+
+# ASP.NET
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Packages
+packages/
+*.nupkg
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio
+.vs/
+*.sln.ide/
+*.userprefs
+*.csproj.user
+*.dbmdl
+*.jfm
+*.rsuser
+
+# Database
+*.mdf
+*.ldf
+*.sdf
+
+# Logs
+Logs/*.log
+
+# Uploads
+Content/uploads/*
+Content/tickets/*
+!Content/uploads/.gitkeep
+!Content/tickets/.gitkeep
+
+# IDE
+.idea/
+*.swp
+*~
+
+# Environment
+.env
+*.config.dev
+*.config.local
+
+# OS
+.DS_Store
+Thumbs.db

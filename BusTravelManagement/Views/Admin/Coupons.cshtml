@@ -1,0 +1,214 @@
+@using System.Linq
+@model IEnumerable<BusTravelManagement.Models.ViewModels.CouponViewModel>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Manage Coupons - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .admin-page { background: #f8f9fa; min-height: calc(100vh - 76px - 250px); }
+        .coupons-card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .coupons-card .card-header { background: #fff; border-bottom: 1px solid #e9ecef; padding: 1rem 1.25rem; border-radius: 12px 12px 0 0 !important; }
+        .coupons-card .card-body { padding: 0; }
+        .coupons-table { font-size: 0.9rem; margin-bottom: 0; }
+        .coupons-table th { background: #f8f9fa; font-weight: 600; color: #6c757d; font-size: 0.8rem; text-transform: uppercase; padding: 0.75rem 1rem; }
+        .coupons-table td { padding: 0.75rem 1rem; vertical-align: middle; }
+        .coupon-code { font-family: 'Courier New', monospace; font-weight: 700; font-size: 1rem; letter-spacing: 1px; color: #1a1a2e; }
+        .status-badge { font-size: 0.75rem; padding: 0.25rem 0.6rem; border-radius: 20px; font-weight: 600; }
+        .discount-badge { background: #dcfce7; color: #166534; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 600; font-size: 0.85rem; }
+        .modal-content { border: none; border-radius: 16px; }
+        .modal-header { border-bottom: 1px solid #e9ecef; border-radius: 16px 16px 0 0; background: linear-gradient(135deg, #1a1a2e, #0f3460); color: #fff; }
+        .modal-header .btn-close { filter: invert(1) brightness(200%); }
+        .modal-body { padding: 1.5rem; }
+        .modal-footer { border-top: 1px solid #e9ecef; border-radius: 0 0 16px 16px; }
+        .modal .form-control, .modal .form-select { padding: 0.6rem 1rem; border-radius: 8px; border: 2px solid #e9ecef; }
+        .modal .form-control:focus, .modal .form-select:focus { border-color: #0d6efd; box-shadow: none; }
+        .action-btn { padding: 0.25rem 0.5rem; border-radius: 6px; }
+        @@media (max-width: 768px) { .coupons-table { font-size: 0.8rem; } }
+    </style>
+}
+
+<div class="admin-page py-4">
+    <div class="container-fluid px-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0"><i class="fas fa-tag me-2"></i>Manage Coupons</h4>
+            <button class="btn btn-primary" onclick="openCreateCouponModal()">
+                <i class="fas fa-plus me-1"></i>Create Coupon
+            </button>
+        </div>
+
+        <div class="card coupons-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-list me-2"></i>Coupons (@Model.Count())</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table coupons-table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Description</th>
+                            <th>Discount</th>
+                            <th>Min Amount</th>
+                            <th>Max Discount</th>
+                            <th>Valid From</th>
+                            <th>Valid To</th>
+                            <th>Usage Limit</th>
+                            <th>Used</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var coupon in Model)
+                            {
+                                <tr>
+                                    <td><span class="coupon-code">@coupon.Code</span></td>
+                                    <td><small>@coupon.Description</small></td>
+                                    <td>
+                                        @if (coupon.DiscountType == "Percentage")
+                                        {
+                                            <span class="discount-badge">@coupon.DiscountValue% OFF</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="discount-badge">₹@coupon.DiscountValue OFF</span>
+                                        }
+                                    </td>
+                                    <td>₹@(coupon.MinBookingAmount.HasValue ? coupon.MinBookingAmount.Value.ToString("N0") : "-")</td>
+                                    <td>₹@(coupon.MaxDiscountAmount.HasValue ? coupon.MaxDiscountAmount.Value.ToString("N0") : "-")</td>
+                                    <td><small>@coupon.ValidFrom.ToString("dd MMM yyyy")</small></td>
+                                    <td><small>@coupon.ValidTo.ToString("dd MMM yyyy")</small></td>
+                                    <td>@coupon.UsageLimit</td>
+                                    <td>@coupon.UsedCount</td>
+                                    <td>
+                                        @if (coupon.IsActive)
+                                        {
+                                            <span class="status-badge bg-success bg-opacity-10 text-success">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-badge bg-danger bg-opacity-10 text-danger">Inactive</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-primary action-btn" onclick="editCoupon('@coupon.Id')" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-outline-@(coupon.IsActive ? "danger" : "success") action-btn" onclick="toggleCoupon('@coupon.Id')" title="@(coupon.IsActive ? "Deactivate" : "Activate")">
+                                                <i class="fas fa-@(coupon.IsActive ? "ban" : "check")"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="11" class="text-center text-muted py-4">No coupons found</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Coupon Modal -->
+<div class="modal fade" id="createCouponModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold"><i class="fas fa-plus-circle me-2"></i>Create Coupon</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            @using (Html.BeginForm("CreateCoupon", "Admin", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Coupon Code</label>
+                            <input type="text" name="Code" class="form-control" placeholder="e.g., WELCOME50" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Discount Type</label>
+                            <select name="DiscountType" class="form-select">
+                                <option value="Percentage">Percentage (%)</option>
+                                <option value="Fixed">Fixed Amount (₹)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Discount Value</label>
+                            <input type="number" name="DiscountValue" class="form-control" placeholder="e.g., 10 or 100" step="0.01" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Min Order Amount (₹)</label>
+                            <input type="number" name="MinOrderAmount" class="form-control" placeholder="e.g., 500" value="0" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Max Discount Amount (₹)</label>
+                            <input type="number" name="MaxDiscountAmount" class="form-control" placeholder="e.g., 200" value="0" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Usage Limit</label>
+                            <input type="number" name="UsageLimit" class="form-control" placeholder="e.g., 100" value="1" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Valid From</label>
+                            <input type="date" name="ValidFrom" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Valid To</label>
+                            <input type="date" name="ValidTo" class="form-control" value="@DateTime.Now.AddMonths(1).ToString("yyyy-MM-dd")" required />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-medium">Description</label>
+                            <textarea name="Description" class="form-control" rows="2" placeholder="Coupon description..."></textarea>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="IsActive" value="true" checked id="newCouponActive" />
+                                <label class="form-check-label" for="newCouponActive">Active</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Create Coupon</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openCreateCouponModal() {
+            var modal = new bootstrap.Modal(document.getElementById('createCouponModal'));
+            modal.show();
+        }
+
+        function toggleCoupon(couponId) {
+            if (confirm('Toggle this coupon status?')) {
+                $.ajax({
+                    url: '/Admin/ToggleCoupon',
+                    type: 'POST',
+                    data: { couponId: couponId },
+                    success: function () { location.reload(); }
+                });
+            }
+        }
+
+        function editCoupon(couponId) {
+            alert('Edit coupon: ' + couponId + ' (Edit form would open)');
+        }
+    </script>
+}

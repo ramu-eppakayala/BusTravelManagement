@@ -1,0 +1,87 @@
+@model BusTravelManagement.Models.ViewModels.CreateCouponViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Create Coupon - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .form-section { padding: 2rem 0; background: #f8f9fa; min-height: calc(100vh - 76px - 250px); }
+        .form-card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .form-card .card-header { background: linear-gradient(135deg, #1a1a2e, #0f3460); color: #fff; border-radius: 12px 12px 0 0 !important; padding: 1.25rem 1.5rem; }
+        .form-card .card-body { padding: 2rem; }
+        .form-card .form-label { font-weight: 600; color: #1a1a2e; }
+        .form-card .form-control, .form-card .form-select { padding: 0.6rem 1rem; border-radius: 8px; border: 2px solid #e9ecef; }
+        .form-card .form-control:focus, .form-card .form-select:focus { border-color: #0d6efd; box-shadow: none; }
+        .btn-submit { padding: 0.6rem 2rem; border-radius: 8px; font-weight: 600; }
+    </style>
+}
+
+<div class="form-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-tag me-2"></i>Create Coupon</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (ViewBag.ErrorMessage != null)
+                        {
+                            <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+                        }
+
+                        @using (Html.BeginForm("CreateCoupon", "Admin", FormMethod.Post, new { role = "form" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Coupon Code</label>
+                                    @Html.TextBoxFor(m => m.Code, new { @class = "form-control", placeholder = "e.g., SAVE20" })
+                                    @Html.ValidationMessageFor(m => m.Code, "", new { @class = "text-danger small" })
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Discount Type</label>
+                                    @Html.DropDownListFor(m => m.DiscountType, new SelectList(new[] { "Percentage", "Fixed" }), "Select Type", new { @class = "form-select" })
+                                    @Html.ValidationMessageFor(m => m.DiscountType, "", new { @class = "text-danger small" })
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Discount Value</label>
+                                    @Html.TextBoxFor(m => m.DiscountValue, new { @class = "form-control", type = "number", step = "0.01" })
+                                    @Html.ValidationMessageFor(m => m.DiscountValue, "", new { @class = "text-danger small" })
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Min Booking Amount</label>
+                                    @Html.TextBoxFor(m => m.MinBookingAmount, new { @class = "form-control", type = "number", step = "0.01" })
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Max Discount Amount</label>
+                                    @Html.TextBoxFor(m => m.MaxDiscountAmount, new { @class = "form-control", type = "number", step = "0.01" })
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Valid From</label>
+                                    @Html.TextBoxFor(m => m.ValidFrom, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Valid To</label>
+                                    @Html.TextBoxFor(m => m.ValidTo, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Usage Limit</label>
+                                    @Html.TextBoxFor(m => m.UsageLimit, new { @class = "form-control", type = "number", min = "1" })
+                                </div>
+                            </div>
+
+                            <div class="mt-4 text-end">
+                                <a href="@Url.Action("Coupons", "Admin")" class="btn btn-outline-secondary btn-submit me-2">Cancel</a>
+                                <button type="submit" class="btn btn-primary btn-submit"><i class="fas fa-save me-2"></i>Create Coupon</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

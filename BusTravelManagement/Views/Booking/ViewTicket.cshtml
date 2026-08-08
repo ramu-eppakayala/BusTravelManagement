@@ -1,0 +1,451 @@
+@model BusTravelManagement.Models.ViewModels.TicketViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "E-Ticket - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .ticket-page {
+            background: #f8f9fa;
+            min-height: calc(100vh - 76px - 250px);
+        }
+        .ticket-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .ticket {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        .ticket-header {
+            background: linear-gradient(135deg, #1a1a2e, #0f3460);
+            color: #fff;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .ticket-header .brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+        .ticket-header .brand i {
+            color: #ffc107;
+        }
+        .ticket-header .ticket-type {
+            background: rgba(255,255,255,0.15);
+            padding: 0.4rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .ticket-body {
+            padding: 2rem;
+        }
+        .ticket-route {
+            text-align: center;
+            padding: 1.5rem 0;
+            border-bottom: 2px dashed #dee2e6;
+            position: relative;
+        }
+        .ticket-route::after {
+            content: '';
+            position: absolute;
+            bottom: -11px;
+            left: -10px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #f8f9fa;
+        }
+        .ticket-route::before {
+            content: '';
+            position: absolute;
+            bottom: -11px;
+            right: -10px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #f8f9fa;
+        }
+        .ticket-route .from-to {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #1a1a2e;
+        }
+        .ticket-route .from-to .arrow {
+            color: #0d6efd;
+            margin: 0 1.5rem;
+        }
+        .ticket-route .time-row {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 1rem;
+        }
+        .ticket-route .time-row .time-block {
+            text-align: center;
+        }
+        .ticket-route .time-row .time-block .time {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        .ticket-route .time-row .time-block .label {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        .ticket-route .time-row .time-block .date {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        .ticket-section {
+            padding: 1.5rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .ticket-section:last-child {
+            border-bottom: none;
+        }
+        .ticket-section .section-title {
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+        .passenger-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .passenger-table th {
+            background: #f8f9fa;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: #6c757d;
+            border-bottom: 2px solid #dee2e6;
+        }
+        .passenger-table td {
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 0.9rem;
+        }
+        .boarding-info {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        .boarding-info .point {
+            flex: 1;
+            min-width: 200px;
+            padding: 1rem;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+        }
+        .boarding-info .point .point-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .boarding-info .point .point-name {
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+        .boarding-info .point .point-address {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        .boarding-info .point .point-time {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #0d6efd;
+        }
+        .qr-code {
+            text-align: center;
+            padding: 1rem;
+        }
+        .qr-code img {
+            width: 120px;
+            height: 120px;
+        }
+        .qr-code .qr-label {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+        .cancellation-policy-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            font-size: 0.85rem;
+        }
+        .cancellation-policy-box ul {
+            margin-bottom: 0;
+            padding-left: 1.25rem;
+        }
+        .cancellation-policy-box li {
+            margin-bottom: 0.25rem;
+        }
+        .ticket-footer {
+            background: #f8f9fa;
+            padding: 1rem 2rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #6c757d;
+            border-top: 1px solid #e9ecef;
+        }
+        .action-bar {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .action-bar .btn {
+            border-radius: 10px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+        }
+        .operator-logo-ticket {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .operator-logo-ticket img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+        }
+        .operator-logo-ticket .op-info .name {
+            font-weight: 700;
+        }
+        .operator-logo-ticket .op-info .bus {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        @@media print {
+            body { background: #fff; padding-top: 0; }
+            .ticket-page { background: #fff; }
+            .navbar, .footer, .action-bar, .toast-container { display: none !important; }
+            .ticket { box-shadow: none; border: 1px solid #dee2e6; }
+            .ticket-route::after, .ticket-route::before { display: none; }
+            .ticket-wrapper { max-width: 100%; }
+        }
+        @@media (max-width: 768px) {
+            .ticket-body { padding: 1.25rem; }
+            .ticket-route .from-to { font-size: 1.3rem; }
+            .ticket-route .from-to .arrow { margin: 0 0.75rem; }
+            .ticket-route .time-row { gap: 1.5rem; }
+            .ticket-header { padding: 1rem 1.25rem; flex-direction: column; text-align: center; gap: 0.5rem; }
+        }
+    </style>
+}
+
+<div class="ticket-page py-4">
+    <div class="ticket-wrapper">
+        <!-- Action Bar (visible on screen only) -->
+        <div class="action-bar">
+            <a href="@Url.Action("DownloadTicket", "Booking", new { bookingNumber = Model.BookingNumber })" class="btn btn-primary">
+                <i class="fas fa-download me-2"></i>Download PDF
+            </a>
+            <button class="btn btn-outline-primary" onclick="window.print()">
+                <i class="fas fa-print me-2"></i>Print
+            </button>
+        </div>
+
+        <div class="ticket mt-3" id="printableTicket">
+            <!-- Ticket Header -->
+            <div class="ticket-header">
+                <div class="brand">
+                    <i class="fas fa-bus me-2"></i>BusTravel
+                </div>
+                <div class="ticket-type">
+                    <i class="fas fa-ticket-alt me-1"></i>E-TICKET
+                </div>
+            </div>
+
+            <div class="ticket-body">
+                <!-- Operator & Bus Info -->
+                <div class="operator-logo-ticket mb-3">
+                    <img src="@Model.OperatorLogo" alt="@Model.OperatorName"
+                         onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2248%22 height=%2248%22><rect fill=%22%230d6efd%22 width=%2248%22 height=%2248%22 rx=%228%22/><text x=%228%22 y=%2232%22 font-size=%2224%22 fill=%22white%22 font-weight=%22bold%22>@Model.OperatorName.Substring(0,1)</text></svg>'" />
+                    <div class="op-info">
+                        <div class="name">@Model.OperatorName</div>
+                        <div class="bus">@Model.BusNumber | @Model.BusType</div>
+                    </div>
+                </div>
+
+                <!-- Route -->
+                <div class="ticket-route">
+                    <div class="from-to">
+                        @Model.SourceCity <i class="fas fa-arrow-right arrow"></i> @Model.DestinationCity
+                    </div>
+                    <div class="time-row">
+                        <div class="time-block">
+                            <div class="time">@Model.DepartureTime</div>
+                            <div class="label">Departure</div>
+                            <div class="date">@Model.JourneyDate.ToString("dd MMM yyyy, dddd")</div>
+                        </div>
+                        <div class="time-block">
+                            <div class="time">@Model.ArrivalTime</div>
+                            <div class="label">Arrival</div>
+                            <div class="date">@Model.JourneyDate.ToString("dd MMM yyyy, dddd")</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Booking Details -->
+                <div class="ticket-section">
+                    <div class="section-title">Booking Details</div>
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Booking Number</small>
+                            <strong>@Model.BookingNumber</strong>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Booking Date</small>
+                            <strong>@Model.BookedAt.ToString("dd MMM yyyy, hh:mm tt")</strong>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Status</small>
+                            <span class="badge bg-success">Confirmed</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QR Code -->
+                <div class="ticket-section text-center">
+                    <div class="qr-code">
+                        <svg width="120" height="120" viewBox="0 0 120 120">
+                            <rect x="0" y="0" width="120" height="120" fill="#fff" rx="4" />
+                            <g transform="translate(10,10)">
+                                <!-- Simplified QR code pattern -->
+                                <rect x="0" y="0" width="100" height="100" fill="#fff" stroke="#000" stroke-width="2" />
+                                <rect x="4" y="4" width="20" height="20" fill="#000" />
+                                <rect x="28" y="4" width="20" height="20" fill="#000" />
+                                <rect x="76" y="4" width="20" height="20" fill="#000" />
+                                <rect x="4" y="28" width="20" height="20" fill="#000" />
+                                <rect x="52" y="28" width="12" height="12" fill="#000" />
+                                <rect x="76" y="28" width="20" height="20" fill="#000" />
+                                <rect x="4" y="76" width="20" height="20" fill="#000" />
+                                <rect x="28" y="76" width="20" height="20" fill="#000" />
+                                <rect x="76" y="76" width="20" height="20" fill="#000" />
+                                <rect x="28" y="52" width="12" height="12" fill="#000" />
+                                <rect x="52" y="52" width="12" height="12" fill="#000" />
+                                <rect x="76" y="52" width="12" height="12" fill="#000" />
+                                <rect x="52" y="76" width="12" height="12" fill="#000" />
+                                <rect x="44" y="16" width="12" height="12" fill="#000" />
+                                <rect x="16" y="44" width="12" height="12" fill="#000" />
+                            </g>
+                        </svg>
+                        <div class="qr-label">Scan for ticket verification</div>
+                    </div>
+                </div>
+
+                <!-- Passenger Details -->
+                <div class="ticket-section">
+                    <div class="section-title">Passenger Details</div>
+                    <table class="passenger-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Age</th>
+                                <th>Gender</th>
+                                <th>Seat</th>
+                                <th>ID Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Passengers != null)
+                            {
+                                int sn = 1;
+                                foreach (var p in Model.Passengers)
+                                {
+                                    <tr>
+                                        <td>@sn</td>
+                                        <td>@p.Name</td>
+                                        <td>@p.Age</td>
+                                        <td>@p.Gender</td>
+                                        <td><strong>@p.SeatNumber</strong></td>
+                                        <td>@p.IdCardType</td>
+                                    </tr>
+                                    sn++;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Boarding/Dropping Info -->
+                <div class="ticket-section">
+                    <div class="section-title">Boarding & Dropping Information</div>
+                    <div class="boarding-info">
+                        <div class="point">
+                            <div class="point-label">
+                                <i class="fas fa-arrow-up text-success me-1"></i>Boarding Point
+                            </div>
+                            <div class="point-name">@Model.BoardingPoint</div>
+                            <div class="point-time">@Model.BoardingTime</div>
+                        </div>
+                        <div class="point">
+                            <div class="point-label">
+                                <i class="fas fa-arrow-down text-danger me-1"></i>Dropping Point
+                            </div>
+                            <div class="point-name">@Model.DroppingPoint</div>
+                            <div class="point-time">@Model.DroppingTime</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cancellation Policy -->
+                <div class="ticket-section">
+                    <div class="section-title">Cancellation Policy</div>
+                    <div class="cancellation-policy-box">
+                        <ul>
+                            <li>Free cancellation up to 4 hours before departure.</li>
+                            <li>25% charge for cancellation between 1-4 hours before departure.</li>
+                            <li>50% charge for cancellation less than 1 hour before departure.</li>
+                            <li>Refund will be processed to the original payment method within 5-7 business days.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Fare Summary -->
+                <div class="ticket-section">
+                    <div class="section-title">Fare Summary</div>
+                    <div class="row g-1">
+                        <div class="col-6 fw-bold">Total Paid</div>
+                        <div class="col-6 text-end fw-bold" style="font-size:1.1rem;">₹@Model.NetAmount.ToString("N2")</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="ticket-footer">
+                <p class="mb-1">
+                    <strong>BusTravel Management</strong> | 123 Travel Street, Mumbai, India | +91 1800-123-4567
+                </p>
+                <p class="mb-0">
+                    This is a computer-generated ticket. <strong>@Model.BookingNumber</strong> |
+                    Issued on @DateTime.Now.ToString("dd MMM yyyy hh:mm tt")
+                </p>
+                <p class="mb-0 mt-1">
+                    <i class="fas fa-shield-alt me-1"></i>Thank you for traveling with BusTravel. Have a safe journey!
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Print-friendly handling
+            // Bootstrap toasts and other interactive elements
+        });
+    </script>
+}

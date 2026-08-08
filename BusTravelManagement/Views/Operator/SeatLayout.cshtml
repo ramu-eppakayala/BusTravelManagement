@@ -1,0 +1,401 @@
+@using System.Linq
+@model BusTravelManagement.Models.ViewModels.SeatLayoutViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Seat Layout - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .layout-page { background: #f8f9fa; min-height: calc(100vh - 76px - 250px); }
+        .layout-card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .layout-card .card-header { background: #fff; border-bottom: 1px solid #e9ecef; font-weight: 700; padding: 1rem 1.25rem; border-radius: 12px 12px 0 0 !important; }
+        .layout-card .card-body { padding: 1.5rem; }
+        .bus-header { background: linear-gradient(135deg, #1a1a2e, #0f3460); border-radius: 12px; padding: 1rem 1.5rem; color: #fff; margin-bottom: 1.5rem; }
+        .bus-header .bus-name { font-weight: 700; font-size: 1.2rem; }
+        .bus-header .bus-info { opacity: 0.85; font-size: 0.9rem; }
+        .bus-container {
+            background: #fff;
+            border: 2px solid #e9ecef;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .bus-container::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -10px;
+            width: 20px;
+            height: 60px;
+            background: #e9ecef;
+            border-radius: 10px;
+            transform: translateY(-50%);
+        }
+        .bus-front {
+            text-align: center;
+            padding: 0.5rem;
+            margin-bottom: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .seat-grid {
+            display: grid;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+        .seat-grid.layout-2x2 {
+            grid-template-columns: repeat(4, 60px);
+        }
+        .seat-grid.layout-2x1 {
+            grid-template-columns: 60px 60px 60px;
+        }
+        .seat-grid.layout-2x3 {
+            grid-template-columns: repeat(5, 60px);
+        }
+        .seat-grid.layout-1x2 {
+            grid-template-columns: 60px 60px;
+        }
+        .seat-item {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border: 2px solid transparent;
+            position: relative;
+            background: #d1fae5;
+            border-color: #059669;
+            color: #065f46;
+        }
+        .seat-item.window {
+            background: #dbeafe;
+            border-color: #2563eb;
+            color: #1e40af;
+        }
+        .seat-item.aisle {
+            background: #fef3c7;
+            border-color: #d97706;
+            color: #92400e;
+        }
+        .seat-item.ladies {
+            background: #fce7f3;
+            border-color: #ec4899;
+            color: #9d174d;
+        }
+        .seat-item.selected {
+            background: #0d6efd;
+            border-color: #0d6efd;
+            color: #fff;
+            transform: scale(1.05);
+        }
+        .seat-item:hover {
+            transform: scale(1.08);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .seat-item .seat-number {
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .seat-item .seat-icon {
+            font-size: 0.8rem;
+        }
+        .seat-item.empty {
+            visibility: hidden;
+        }
+        .seat-spacer {
+            width: 60px;
+            height: 60px;
+        }
+        .seat-legend {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+        .seat-legend .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+        .seat-legend .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid;
+        }
+        .seat-legend .legend-box.window { background: #dbeafe; border-color: #2563eb; }
+        .seat-legend .legend-box.aisle { background: #fef3c7; border-color: #d97706; }
+        .seat-legend .legend-box.ladies { background: #fce7f3; border-color: #ec4899; }
+        .seat-legend .legend-box.regular { background: #d1fae5; border-color: #059669; }
+        .seat-properties {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+        .seat-properties .btn-group .btn {
+            border-radius: 8px;
+            padding: 0.4rem 0.75rem;
+            font-size: 0.85rem;
+        }
+        .btn-save-layout {
+            padding: 0.7rem 2rem;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+        .driver-position {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .driver-position .driver-icon {
+            display: inline-block;
+            background: #e9ecef;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        .aisle-gap {
+            width: 20px;
+        }
+        .layout-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        .layout-controls label {
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+        .layout-controls select, .layout-controls input {
+            padding: 0.4rem 0.75rem;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+        .layout-controls select:focus, .layout-controls input:focus {
+            border-color: #0d6efd;
+            box-shadow: none;
+        }
+        .steering-wheel {
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+            color: #6c757d;
+        }
+        @@media (max-width: 576px) {
+            .seat-grid { gap: 0.3rem; }
+            .seat-grid.layout-2x2 { grid-template-columns: repeat(4, 50px); }
+            .seat-grid.layout-2x1 { grid-template-columns: repeat(3, 50px); }
+            .seat-grid.layout-2x3 { grid-template-columns: repeat(5, 50px); }
+            .seat-grid.layout-1x2 { grid-template-columns: repeat(2, 50px); }
+            .seat-item { width: 50px; height: 50px; font-size: 0.6rem; }
+            .bus-container { padding: 1rem; }
+        }
+    </style>
+}
+
+<div class="layout-page py-4">
+    <div class="container">
+        <!-- Bus Header -->
+        <div class="bus-header">
+            <div class="row align-items-center">
+                <div class="col">
+                    <div class="bus-name"><i class="fas fa-bus me-2"></i>@Model.BusNumber</div>
+                    <div class="bus-info">@Model.SeatLayoutType | @Model.TotalSeats Seats | @Model.SeatLayoutType Layout</div>
+                </div>
+                <div class="col-auto">
+                    <span class="badge bg-light text-dark px-3 py-2">
+                        <i class="fas fa-chair me-1"></i>@Model.Seats.Count(s => s.Status == "Available") active seats
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="layout-card">
+                    <div class="card-header">
+                        <i class="fas fa-chair me-2"></i>Seat Layout Editor
+                    </div>
+                    <div class="card-body">
+                        <div class="steering-wheel">
+                            <i class="fas fa-steering-wheel"></i>
+                        </div>
+                        <div class="bus-front">Driver</div>
+
+                        <div class="bus-container">
+                            <div class="seat-grid layout-@Model.SeatLayoutType.ToLower()" id="seatGrid">
+                                @if (Model.Seats != null)
+                                {
+                                    var cols = Model.SeatLayoutType == "2x2" ? 4 : Model.SeatLayoutType == "2x1" ? 3 : Model.SeatLayoutType == "2x3" ? 5 : 2;
+                                    int count = 0;
+                                    foreach (var seat in Model.Seats.OrderBy(s => s.RowNumber).ThenBy(s => s.ColumnNumber))
+                                    {
+                                        if (count > 0 && count % cols == 0)
+                                        {
+                                            if (cols == 4 && count % 2 == 0)
+                                            {
+                                                @* Aisle spacer *@
+                                                <div class="seat-spacer"></div>
+                                            }
+                                        }
+                                        count++;
+                                        var seatClass = seat.SeatPosition == "Window" ? "window" : seat.SeatPosition == "Aisle" ? "aisle" : "";
+                                        <div class="seat-item @seatClass @(seat.IsLadiesSeat ? "ladies" : "") @(seat.Status == "Selected" ? "selected" : "")"
+                                             data-seat-id="@seat.SeatId"
+                                             data-row="@seat.RowNumber"
+                                             data-column="@seat.ColumnNumber"
+                                             onclick="selectSeat(this, '@seat.SeatId')"
+                                             title="Row: @seat.RowNumber, Col: @seat.ColumnNumber">
+                                            <span class="seat-icon"><i class="fas fa-chair"></i></span>
+                                            <span class="seat-number">@seat.SeatNumber</span>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Seat Legend -->
+                        <div class="seat-legend">
+                            <div class="legend-item">
+                                <div class="legend-box window"></div>
+                                <span>Window</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-box aisle"></div>
+                                <span>Aisle</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-box ladies"></div>
+                                <span>Ladies</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-box regular"></div>
+                                <span>Regular</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seat Properties -->
+            <div class="col-lg-4">
+                <div class="layout-card">
+                    <div class="card-header">
+                        <i class="fas fa-sliders-h me-2"></i>Seat Properties
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted small mb-3">Click on a seat to modify its properties.</p>
+
+                        <div id="seatPropertiesPanel" class="seat-properties">
+                            <p class="text-muted mb-0 text-center">
+                                <i class="fas fa-hand-pointer me-1"></i>Select a seat to edit
+                            </p>
+                        </div>
+
+                        <hr />
+
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary btn-save-layout" onclick="saveLayout()">
+                                <i class="fas fa-save me-2"></i>Save Layout
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="resetLayout()">
+                                <i class="fas fa-undo me-2"></i>Reset to Default
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var selectedSeatId = null;
+
+        function selectSeat(element, seatId) {
+            $('.seat-item').removeClass('selected');
+            $(element).addClass('selected');
+            selectedSeatId = seatId;
+
+            var row = $(element).data('row');
+            var col = $(element).data('column');
+            var isWindow = $(element).hasClass('window');
+            var isAisle = $(element).hasClass('aisle');
+            var isLadies = $(element).hasClass('ladies');
+            var seatName = $(element).find('.seat-number').text();
+
+            var panel = $('#seatPropertiesPanel');
+            panel.html(
+                '<h6 class="fw-bold mb-3">Seat: ' + seatName + '</h6>' +
+                '<div class="mb-2"><small class="text-muted">Row: ' + row + ', Column: ' + col + '</small></div>' +
+                '<div class="btn-group d-flex mb-2" role="group">' +
+                '<button type="button" class="btn btn-sm ' + (isWindow ? 'btn-primary' : 'btn-outline-primary') + '" onclick="toggleProperty(\'window\')">Window</button>' +
+                '<button type="button" class="btn btn-sm ' + (isAisle ? 'btn-primary' : 'btn-outline-primary') + '" onclick="toggleProperty(\'aisle\')">Aisle</button>' +
+                '<button type="button" class="btn btn-sm ' + (isLadies ? 'btn-primary' : 'btn-outline-primary') + '" onclick="toggleProperty(\'ladies\')">Ladies</button>' +
+                '</div>' +
+                '<small class="text-muted">Click a property to toggle it on/off for this seat.</small>'
+            );
+        }
+
+        function toggleProperty(prop) {
+            if (!selectedSeatId) return;
+            $.ajax({
+                url: '/Operator/ToggleSeatProperty',
+                type: 'POST',
+                data: { seatId: selectedSeatId, property: prop },
+                success: function () { location.reload(); },
+                error: function () { location.reload(); }
+            });
+        }
+
+        function saveLayout() {
+            $.ajax({
+                url: '/Operator/SaveSeatLayout',
+                type: 'POST',
+                data: { busId: '@Model.BusId' },
+                success: function (response) {
+                    if (response.success) {
+                        alert('Seat layout saved successfully!');
+                    } else {
+                        alert('Error saving layout: ' + response.message);
+                    }
+                },
+                error: function () {
+                    alert('Error saving layout. Please try again.');
+                }
+            });
+        }
+
+        function resetLayout() {
+            if (confirm('Reset seat layout to default? This will clear all customizations.')) {
+                $.ajax({
+                    url: '/Operator/ResetSeatLayout',
+                    type: 'POST',
+                    data: { busId: '@Model.BusId' },
+                    success: function () { location.reload(); },
+                    error: function () { alert('Error resetting layout.'); }
+                });
+            }
+        }
+    </script>
+}

@@ -1,0 +1,33 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "FAQ - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .faq-section { padding: 4rem 0; }
+        .faq-section h2 { font-weight: 700; color: #1a1a2e; margin-bottom: 2rem; }
+        .accordion-item { border: 1px solid #e9ecef; border-radius: 10px !important; margin-bottom: 0.75rem; }
+        .accordion-button { font-weight: 600; color: #1a1a2e; background: #fff; border-radius: 10px !important; box-shadow: none !important; }
+        .accordion-button:not(.collapsed) { background: #f0f7ff; color: #0d6efd; }
+        .accordion-body { color: #6c757d; }
+    </style>
+}
+
+<div class="faq-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <h2 class="text-center">Frequently Asked Questions</h2>
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">How do I book a bus ticket?</button></h2><div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion"><div class="accordion-body">Enter your source and destination cities, select your travel date, choose a bus, pick your seats, and complete the payment. Your e-ticket will be sent to your email.</div></div></div>
+                    <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">Can I cancel my booking?</button></h2><div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body">Yes, you can cancel your booking from the My Bookings page. Cancellation charges apply as per the operator's policy. Free cancellation is available up to 4 hours before departure.</div></div></div>
+                    <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">How long does it take to get a refund?</button></h2><div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body">Refunds are typically processed within 5-7 business days. The amount is credited back to your original payment method.</div></div></div>
+                    <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">How do I view my ticket?</button></h2><div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body">You can view and download your e-ticket from the My Bookings section after logging into your account. A copy is also sent to your email.</div></div></div>
+                    <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">Can I change my boarding point?</button></h2><div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body">Boarding points can be changed up to 24 hours before departure, subject to the operator's approval. Please contact our support team for assistance.</div></div></div>
+                    <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">What payment methods are accepted?</button></h2><div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body">We accept all major credit/debit cards, UPI, net banking, and popular digital wallets.</div></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

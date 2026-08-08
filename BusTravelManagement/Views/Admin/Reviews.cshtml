@@ -1,0 +1,167 @@
+@using System.Linq
+@model IEnumerable<BusTravelManagement.Models.ViewModels.ReviewViewModel>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Manage Reviews - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .admin-page { background: #f8f9fa; min-height: calc(100vh - 76px - 250px); }
+        .reviews-card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .reviews-card .card-header { background: #fff; border-bottom: 1px solid #e9ecef; padding: 1rem 1.25rem; border-radius: 12px 12px 0 0 !important; }
+        .reviews-card .card-body { padding: 1.25rem; }
+        .review-item {
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+        .review-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .review-item.pending { border-left: 4px solid #ffc107; }
+        .review-item .review-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .review-item .reviewer { font-weight: 600; color: #1a1a2e; }
+        .review-item .review-date { font-size: 0.8rem; color: #6c757d; }
+        .review-item .review-operator { font-size: 0.85rem; color: #0d6efd; }
+        .review-item .review-stars { color: #ffc107; font-size: 0.9rem; }
+        .review-item .review-text { color: #495057; margin-top: 0.5rem; }
+        .review-item .review-status {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .review-item .review-actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
+        .review-item .review-actions .btn { border-radius: 8px; padding: 0.3rem 1rem; font-size: 0.85rem; font-weight: 600; }
+        .empty-state { text-align: center; padding: 3rem 1rem; }
+        .empty-state .icon { font-size: 3rem; color: #d1d5db; margin-bottom: 1rem; }
+        .filter-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; }
+        .filter-tabs .btn { border-radius: 20px; font-size: 0.85rem; padding: 0.3rem 1rem; }
+        @@media (max-width: 768px) {
+            .review-item .review-header { flex-direction: column; gap: 0.5rem; }
+        }
+    </style>
+}
+
+<div class="admin-page py-4">
+    <div class="container-fluid px-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0"><i class="fas fa-star me-2"></i>Manage Reviews</h4>
+            <span class="text-muted small">@Model.Count() reviews</span>
+        </div>
+
+        <div class="card reviews-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-list me-2"></i>All Reviews</span>
+                <div class="filter-tabs">
+                    <button class="btn btn-outline-primary btn-sm active" data-filter="all">All</button>
+                    <button class="btn btn-outline-warning btn-sm" data-filter="pending">Pending</button>
+                    <button class="btn btn-outline-success btn-sm" data-filter="approved">Approved</button>
+                    <button class="btn btn-outline-danger btn-sm" data-filter="rejected">Rejected</button>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var review in Model)
+                    {
+                        <div class="review-item pending" data-status="pending">
+                            <div class="review-header">
+                                <div>
+                                    <div class="reviewer">
+                                        <i class="fas fa-user-circle me-1 text-muted"></i>@review.UserName
+                                    </div>
+                                    <div class="review-operator">
+                                        <i class="fas fa-bus me-1"></i>Bus #@review.BusId
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="review-status bg-warning bg-opacity-10 text-warning">
+                                        Pending
+                                    </span>
+                                    <div class="review-date mt-1">@review.CreatedAt.ToString("dd MMM yyyy")</div>
+                                </div>
+                            </div>
+                            <div class="review-stars mt-2">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= review.Rating)
+                                    {
+                                        <i class="fas fa-star"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="far fa-star"></i>
+                                    }
+                                }
+                            </div>
+                            <div class="review-text">@review.ReviewText</div>
+                            @if (true)
+                            {
+                                <div class="review-actions">
+                                    <button class="btn btn-success btn-sm" onclick="approveReview('@review.Id')">
+                                        <i class="fas fa-check me-1"></i>Approve
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="rejectReview('@review.Id')">
+                                        <i class="fas fa-times me-1"></i>Reject
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <div class="icon"><i class="fas fa-star"></i></div>
+                        <h5 class="fw-bold text-muted">No Reviews</h5>
+                        <p class="text-muted">There are no reviews to manage at this time.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function approveReview(reviewId) {
+            if (confirm('Approve this review?')) {
+                $.ajax({
+                    url: '/Admin/ApproveReview',
+                    type: 'POST',
+                    data: { reviewId: reviewId },
+                    success: function () { location.reload(); }
+                });
+            }
+        }
+
+        function rejectReview(reviewId) {
+            if (confirm('Reject this review?')) {
+                $.ajax({
+                    url: '/Admin/RejectReview',
+                    type: 'POST',
+                    data: { reviewId: reviewId },
+                    success: function () { location.reload(); }
+                });
+            }
+        }
+
+        $(document).ready(function () {
+            $('.filter-tabs .btn').on('click', function () {
+                $('.filter-tabs .btn').removeClass('active');
+                $(this).addClass('active');
+                var filter = $(this).data('filter');
+                $('.review-item').each(function () {
+                    if (filter === 'all') {
+                        $(this).show();
+                    } else {
+                        $(this).toggle($(this).data('status') === filter);
+                    }
+                });
+            });
+        });
+    </script>
+}

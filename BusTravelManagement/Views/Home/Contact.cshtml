@@ -1,0 +1,30 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Contact Us - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .contact-section { padding: 4rem 0; }
+        .contact-section h2 { font-weight: 700; color: #1a1a2e; }
+        .contact-card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 1.5rem; height: 100%; }
+        .contact-card .icon { font-size: 2rem; color: #0d6efd; margin-bottom: 1rem; }
+        .contact-card h5 { font-weight: 700; }
+    </style>
+}
+
+<div class="contact-section">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="mb-3">Contact Us</h2>
+                <p class="lead text-muted">We'd love to hear from you. Get in touch with our support team.</p>
+            </div>
+        </div>
+        <div class="row g-4 mb-5">
+            <div class="col-md-4"><div class="contact-card text-center"><div class="icon"><i class="fas fa-phone"></i></div><h5>Phone</h5><p class="text-muted">+91 1800-123-4567</p></div></div>
+            <div class="col-md-4"><div class="contact-card text-center"><div class="icon"><i class="fas fa-envelope"></i></div><h5>Email</h5><p class="text-muted">support@bustravel.com</p></div></div>
+            <div class="col-md-4"><div class="contact-card text-center"><div class="icon"><i class="fas fa-map-marker-alt"></i></div><h5>Office</h5><p class="text-muted">123 Travel Street, Mumbai, India</p></div></div>
+        </div>
+    </div>
+</div>

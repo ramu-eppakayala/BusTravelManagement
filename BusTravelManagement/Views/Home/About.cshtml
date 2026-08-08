@@ -1,0 +1,32 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "About Us - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .about-section { padding: 4rem 0; }
+        .about-section h2 { font-weight: 700; color: #1a1a2e; }
+        .about-section .lead { font-size: 1.15rem; color: #6c757d; }
+        .value-card { text-align: center; padding: 2rem; border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); height: 100%; }
+        .value-card .icon { font-size: 2.5rem; color: #0d6efd; margin-bottom: 1rem; }
+        .value-card h5 { font-weight: 700; }
+    </style>
+}
+
+<div class="about-section">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="mb-3">About BusTravel Management</h2>
+                <p class="lead">India's most trusted bus booking platform. We connect millions of travelers with the best bus operators across the country.</p>
+                <p>Founded with a vision to make bus travel simple, reliable, and accessible, BusTravel Management has grown to become one of the leading bus ticketing platforms in India. We partner with thousands of bus operators to provide the widest selection of routes and schedules.</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4"><div class="value-card"><div class="icon"><i class="fas fa-shield-alt"></i></div><h5>Trust & Safety</h5><p class="text-muted small">All operators are verified. Your safety is our top priority.</p></div></div>
+            <div class="col-md-4"><div class="value-card"><div class="icon"><i class="fas fa-headset"></i></div><h5>24/7 Support</h5><p class="text-muted small">Round-the-clock customer assistance for all your travel needs.</p></div></div>
+            <div class="col-md-4"><div class="value-card"><div class="icon"><i class="fas fa-tags"></i></div><h5>Best Prices</h5><p class="text-muted small">Price match guarantee with exclusive discounts and offers.</p></div></div>
+        </div>
+    </div>
+</div>

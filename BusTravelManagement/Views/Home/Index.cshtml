@@ -1,0 +1,545 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Home - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 60%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+        @@keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .hero-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+        .hero-subtitle {
+            font-size: 1.15rem;
+            opacity: 0.9;
+        }
+        .search-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+        .search-card .form-control,
+        .search-card .form-select {
+            padding: 0.7rem 1rem;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            transition: border-color 0.3s;
+        }
+        .search-card .form-control:focus,
+        .search-card .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: none;
+        }
+        .search-card .btn-search {
+            padding: 0.7rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        .section-title {
+            font-weight: 700;
+            color: #1a1a2e;
+            position: relative;
+            margin-bottom: 2rem;
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: #0d6efd;
+            border-radius: 2px;
+            margin-top: 10px;
+        }
+        .route-card {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .route-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-color: #0d6efd;
+            color: inherit;
+        }
+        .route-card .route-arrow {
+            color: #0d6efd;
+            font-size: 1.2rem;
+        }
+        .route-card .route-price {
+            font-weight: 700;
+            color: #0d6efd;
+        }
+        .operator-card {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .operator-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .operator-card .operator-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 1rem;
+        }
+        .operator-card .rating {
+            color: #ffc107;
+        }
+        .step-card {
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+        .step-number {
+            width: 60px;
+            height: 60px;
+            line-height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0d6efd, #0a58ca);
+            color: #fff;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 8px 20px rgba(13, 110, 253, 0.3);
+        }
+        .feature-card {
+            padding: 2rem 1.5rem;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s;
+            text-align: center;
+            height: 100%;
+        }
+        .feature-card:hover {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+        .feature-icon {
+            font-size: 2.5rem;
+            color: #0d6efd;
+            margin-bottom: 1rem;
+        }
+        .bg-soft-primary {
+            background-color: #f0f7ff;
+        }
+        .popular-tag {
+            font-size: 0.75rem;
+            background: #dcfce7;
+            color: #166534;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+        }
+        .city-autocomplete {
+            position: relative;
+        }
+        .city-autocomplete .dropdown-menu {
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        @@media (max-width: 768px) {
+            .hero-title { font-size: 1.8rem; }
+            .hero-section { padding: 50px 0; }
+            .search-card { padding: 20px; }
+        }
+    </style>
+}
+
+<div class="hero-section">
+    <div class="container position-relative">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h1 class="hero-title mb-3">Book Bus Tickets <br>with Confidence</h1>
+                <p class="hero-subtitle mb-4">Travel across India with the largest network of bus operators. Best prices, guaranteed comfort, and 24/7 support.</p>
+                <div class="d-flex gap-3 mb-3">
+                    <span class="badge bg-light text-dark rounded-pill px-3 py-2"><i class="fas fa-shield-alt text-success me-1"></i> Safe Travel</span>
+                    <span class="badge bg-light text-dark rounded-pill px-3 py-2"><i class="fas fa-tag text-primary me-1"></i> Best Prices</span>
+                    <span class="badge bg-light text-dark rounded-pill px-3 py-2"><i class="fas fa-headset text-warning me-1"></i> 24/7 Support</span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <form class="search-card" action="/Search/Search" method="POST">
+                    <h4 class="fw-bold mb-3 text-dark">Find Your Bus</h4>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-dark fw-medium">From</label>
+                            <div class="city-autocomplete">
+                                <input type="hidden" name="sourceCityId" id="sourceCityId" />
+                                <input type="text" name="sourceCity" id="sourceCity" class="form-control" placeholder="Enter source city" required autocomplete="off" />
+                                <div class="dropdown-menu" id="sourceSuggestions"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-dark fw-medium">To</label>
+                            <div class="city-autocomplete">
+                                <input type="hidden" name="destinationCityId" id="destinationCityId" />
+                                <input type="text" name="destinationCity" id="destinationCity" class="form-control" placeholder="Enter destination city" required autocomplete="off" />
+                                <div class="dropdown-menu" id="destinationSuggestions"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-dark fw-medium">Date</label>
+                            <input type="date" name="journeyDate" id="journeyDate" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary btn-search w-100">
+                                <i class="fas fa-search me-2"></i>Search Buses
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="py-5">
+    <div class="container">
+        <h2 class="section-title">Popular Routes</h2>
+        <div class="row g-3">
+            <div class="col-lg-4 col-md-6">
+                <a href="/Search/Search?sourceCity=Mumbai&destinationCity=Pune&travelDate=@DateTime.Now.ToString("yyyy-MM-dd")" class="route-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1 fw-bold">Mumbai</h6>
+                            <small class="text-muted">Maharashtra</small>
+                        </div>
+                        <div class="route-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                        <div class="text-end">
+                            <h6 class="mb-1 fw-bold">Pune</h6>
+                            <small class="text-muted">Maharashtra</small>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span class="popular-tag"><i class="fas fa-bus me-1"></i> 45+ buses</span>
+                        <span class="route-price">From ₹350</span>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <a href="/Search/Search?sourceCity=Delhi&destinationCity=Jaipur&travelDate=@DateTime.Now.ToString("yyyy-MM-dd")" class="route-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1 fw-bold">Delhi</h6>
+                            <small class="text-muted">Delhi</small>
+                        </div>
+                        <div class="route-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                        <div class="text-end">
+                            <h6 class="mb-1 fw-bold">Jaipur</h6>
+                            <small class="text-muted">Rajasthan</small>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span class="popular-tag"><i class="fas fa-bus me-1"></i> 60+ buses</span>
+                        <span class="route-price">From ₹499</span>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <a href="/Search/Search?sourceCity=Bangalore&destinationCity=Chennai&travelDate=@DateTime.Now.ToString("yyyy-MM-dd")" class="route-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1 fw-bold">Bangalore</h6>
+                            <small class="text-muted">Karnataka</small>
+                        </div>
+                        <div class="route-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                        <div class="text-end">
+                            <h6 class="mb-1 fw-bold">Chennai</h6>
+                            <small class="text-muted">Tamil Nadu</small>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span class="popular-tag"><i class="fas fa-bus me-1"></i> 50+ buses</span>
+                        <span class="route-price">From ₹699</span>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <a href="/Search/Search?sourceCity=Hyderabad&destinationCity=Bangalore&travelDate=@DateTime.Now.ToString("yyyy-MM-dd")" class="route-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1 fw-bold">Hyderabad</h6>
+                            <small class="text-muted">Telangana</small>
+                        </div>
+                        <div class="route-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                        <div class="text-end">
+                            <h6 class="mb-1 fw-bold">Bangalore</h6>
+                            <small class="text-muted">Karnataka</small>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span class="popular-tag"><i class="fas fa-bus me-1"></i> 40+ buses</span>
+                        <span class="route-price">From ₹599</span>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <a href="/Search/Search?sourceCity=Kolkata&destinationCity=Bhubaneswar&travelDate=@DateTime.Now.ToString("yyyy-MM-dd")" class="route-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1 fw-bold">Kolkata</h6>
+                            <small class="text-muted">West Bengal</small>
+                        </div>
+                        <div class="route-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                        <div class="text-end">
+                            <h6 class="mb-1 fw-bold">Bhubaneswar</h6>
+                            <small class="text-muted">Odisha</small>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span class="popular-tag"><i class="fas fa-bus me-1"></i> 35+ buses</span>
+                        <span class="route-price">From ₹450</span>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <a href="/Search/Search?sourceCity=Ahmedabad&destinationCity=Surat&travelDate=@DateTime.Now.ToString("yyyy-MM-dd")" class="route-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1 fw-bold">Ahmedabad</h6>
+                            <small class="text-muted">Gujarat</small>
+                        </div>
+                        <div class="route-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                        <div class="text-end">
+                            <h6 class="mb-1 fw-bold">Surat</h6>
+                            <small class="text-muted">Gujarat</small>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span class="popular-tag"><i class="fas fa-bus me-1"></i> 30+ buses</span>
+                        <span class="route-price">From ₹299</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-soft-primary">
+    <div class="container">
+        <h2 class="section-title">Top Operators</h2>
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="operator-card">
+                    <img src="~/Content/images/operator-1.png" alt="SRS Travels" class="operator-logo" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22><rect fill=%22%230d6efd%22 width=%2280%22 height=%2280%22 rx=%2212%22/><text x=%2216%22 y=%2248%22 font-size=%2224%22 fill=%22white%22 font-weight=%22bold%22>SRS</text></svg>'">
+                    <h6 class="fw-bold mb-1">SRS Travels</h6>
+                    <div class="rating">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                        <span class="text-muted small ms-1">4.5</span>
+                    </div>
+                    <small class="text-muted">50+ routes</small>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="operator-card">
+                    <img src="~/Content/images/operator-2.png" alt="Orange Travels" class="operator-logo" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22><rect fill=%22%23fd7e14%22 width=%2280%22 height=%2280%22 rx=%2212%22/><text x=%228%22 y=%2248%22 font-size=%2220%22 fill=%22white%22 font-weight=%22bold%22>OT</text></svg>'">
+                    <h6 class="fw-bold mb-1">Orange Travels</h6>
+                    <div class="rating">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        <span class="text-muted small ms-1">5.0</span>
+                    </div>
+                    <small class="text-muted">80+ routes</small>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="operator-card">
+                    <img src="~/Content/images/operator-3.png" alt="VRL Travels" class="operator-logo" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22><rect fill=%22%23198138%22 width=%2280%22 height=%2280%22 rx=%2212%22/><text x=%2216%22 y=%2248%22 font-size=%2224%22 fill=%22white%22 font-weight=%22bold%22>VRL</text></svg>'">
+                    <h6 class="fw-bold mb-1">VRL Travels</h6>
+                    <div class="rating">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                        <span class="text-muted small ms-1">4.7</span>
+                    </div>
+                    <small class="text-muted">120+ routes</small>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="operator-card">
+                    <img src="~/Content/images/operator-4.png" alt="KPN Travels" class="operator-logo" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22><rect fill=%22%236f42c1%22 width=%2280%22 height=%2280%22 rx=%2212%22/><text x=%2214%22 y=%2248%22 font-size=%2224%22 fill=%22white%22 font-weight=%22bold%22>KPN</text></svg>'">
+                    <h6 class="fw-bold mb-1">KPN Travels</h6>
+                    <div class="rating">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i>
+                        <span class="text-muted small ms-1">4.0</span>
+                    </div>
+                    <small class="text-muted">65+ routes</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <h2 class="section-title text-center mb-5">How It Works</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h5 class="fw-bold">Search Buses</h5>
+                    <p class="text-muted">Enter your source, destination, and travel date to find available buses.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h5 class="fw-bold">Select Seats</h5>
+                    <p class="text-muted">Choose your preferred seats from the interactive seat layout.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h5 class="fw-bold">Pay & Travel</h5>
+                    <p class="text-muted">Make a secure payment and get your e-ticket instantly.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="section-title text-center mb-5">Why Choose BusTravel</h2>
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h5 class="fw-bold">Safe & Secure</h5>
+                    <p class="text-muted small">All operators verified. Your safety is our priority.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-wifi"></i></div>
+                    <h5 class="fw-bold">Free Cancellation</h5>
+                    <p class="text-muted small">Cancel up to 4 hours before departure at no charge.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-tags"></i></div>
+                    <h5 class="fw-bold">Best Prices</h5>
+                    <p class="text-muted small">Price match guarantee. We won't be beaten on price.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-headset"></i></div>
+                    <h5 class="fw-bold">24/7 Support</h5>
+                    <p class="text-muted small">Round-the-clock customer support for all your queries.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-primary text-white text-center">
+    <div class="container">
+        <h3 class="fw-bold mb-3">Ready to Travel?</h3>
+        <p class="mb-4 opacity-75">Join millions of happy travelers. Book your bus ticket now!</p>
+        <a href="/Search" class="btn btn-light btn-lg px-5 fw-bold">Get Started</a>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            function setupAutocomplete(inputId, hiddenId, suggestionsId) {
+                var input = $('#' + inputId);
+                var hidden = $('#' + hiddenId);
+                var suggestions = $('#' + suggestionsId);
+                var request = null;
+
+                input.on('input', function () {
+                    var val = $(this).val();
+                    // Text changed after a selection: drop the stored city id
+                    if (hidden.val() && val.toLowerCase() !== $(this).data('selectedText')) {
+                        hidden.val('');
+                    }
+                    if (val.length < 1) {
+                        suggestions.removeClass('show');
+                        return;
+                    }
+                    if (request) request.abort();
+                    request = $.getJSON('/Search/SearchCities', { term: val }, function (results) {
+                        if (!results || results.length === 0) {
+                            suggestions.removeClass('show');
+                            return;
+                        }
+                        suggestions.empty();
+                        results.forEach(function (city) {
+                            suggestions.append('<button class="dropdown-item" type="button" data-id="' + city.id + '" data-text="' + city.text + '">' + city.text + '</button>');
+                        });
+                        suggestions.addClass('show');
+                    });
+                });
+
+                suggestions.on('click', '.dropdown-item', function () {
+                    var id = $(this).data('id');
+                    var text = $(this).data('text');
+                    input.val(text).data('selectedText', text.toLowerCase());
+                    hidden.val(id);
+                    suggestions.removeClass('show');
+                });
+
+                $(document).on('click', function (e) {
+                    if (!$(e.target).closest('.city-autocomplete').length) {
+                        suggestions.removeClass('show');
+                    }
+                });
+            }
+
+            setupAutocomplete('sourceCity', 'sourceCityId', 'sourceSuggestions');
+            setupAutocomplete('destinationCity', 'destinationCityId', 'destinationSuggestions');
+
+            // Set min date to today
+            var today = new Date().toISOString().split('T')[0];
+            $('#journeyDate').attr('min', today);
+        });
+    </script>
+}

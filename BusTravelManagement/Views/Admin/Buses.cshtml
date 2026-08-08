@@ -1,0 +1,62 @@
+@using System.Linq;
+@model IEnumerable<BusTravelManagement.Models.ViewModels.BusListViewModel>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Manage Buses - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .admin-section { padding: 2rem 0; background: #f8f9fa; min-height: calc(100vh - 76px - 250px); }
+        .admin-card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .admin-card .card-header { background: linear-gradient(135deg, #1a1a2e, #0f3460); color: #fff; border-radius: 12px 12px 0 0 !important; padding: 1.25rem 1.5rem; }
+        .admin-card .card-body { padding: 1.5rem; }
+        .table { margin: 0; }
+        .table th { border-top: none; color: #6c757d; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .badge-status { font-size: 0.8rem; padding: 0.35em 0.65em; }
+    </style>
+}
+
+<div class="admin-section">
+    <div class="container-fluid px-4">
+        <div class="card admin-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5><i class="fas fa-bus me-2"></i>All Buses</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Bus Number</th>
+                                <th>Type</th>
+                                <th>Seats</th>
+                                <th>AC</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var bus in Model)
+                                {
+                                    <tr>
+                                        <td class="fw-bold">@bus.BusNumber</td>
+                                        <td>@bus.BusType</td>
+                                        <td>@bus.TotalSeats</td>
+                                        <td>@(bus.IsAC ? "Yes" : "No")</td>
+                                        <td><span class="badge bg-@(bus.IsActive ? "success" : "danger") badge-status">@(bus.IsActive ? "Active" : "Inactive")</span></td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="5" class="text-center text-muted py-4">No buses registered yet.</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

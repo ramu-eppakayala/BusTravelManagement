@@ -1,0 +1,165 @@
+
+@model BusTravelManagement.Models.ViewModels.LoginViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Login - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .login-page {
+            min-height: calc(100vh - 76px - 250px);
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9edf5 100%);
+        }
+        .login-card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
+        .login-card .card-header {
+            background: linear-gradient(135deg, #1a1a2e, #0f3460);
+            color: #fff;
+            border-radius: 16px 16px 0 0 !important;
+            padding: 1.5rem;
+            text-align: center;
+            border: none;
+        }
+        .login-card .card-header h4 {
+            margin: 0;
+            font-weight: 700;
+        }
+        .login-card .card-body {
+            padding: 2rem;
+        }
+        .login-card .form-control {
+            padding: 0.7rem 1rem;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            transition: border-color 0.3s;
+        }
+        .login-card .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: none;
+        }
+        .login-card .btn-login {
+            padding: 0.7rem;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        .login-card .form-check-input:checked {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        .social-btn {
+            border-radius: 10px;
+            padding: 0.6rem;
+            font-weight: 500;
+        }
+        .divider {
+            display: flex;
+            align-items: center;
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .divider::before {
+            margin-right: 1rem;
+        }
+        .divider::after {
+            margin-left: 1rem;
+        }
+        @@media (max-width: 576px) {
+            .login-card .card-body { padding: 1.5rem; }
+        }
+    </style>
+}
+
+<div class="login-page py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5 col-lg-4">
+                <div class="card login-card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-sign-in-alt me-2"></i>Welcome Back</h4>
+                        <p class="mb-0 small opacity-75">Sign in to your account</p>
+                    </div>
+                    <div class="card-body">
+                        @Html.ValidationSummary(true, "", new { @class = "alert alert-danger", role = "alert" })
+
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+
+                        @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+                        {
+                            @Html.AntiForgeryToken()
+
+                            <div class="mb-3">
+                                @Html.LabelFor(m => m.Email, new { @class = "form-label fw-medium" })
+                                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Enter your email" })
+                                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "invalid-feedback d-block" })
+                            </div>
+
+                            <div class="mb-3">
+                                @Html.LabelFor(m => m.Password, new { @class = "form-label fw-medium" })
+                                @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Enter your password" })
+                                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "invalid-feedback d-block" })
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="form-check">
+                                    @Html.CheckBoxFor(m => m.RememberMe, new { @class = "form-check-input" })
+                                    @Html.LabelFor(m => m.RememberMe, new { @class = "form-check-label" })
+                                </div>
+                                @Html.ActionLink("Forgot Password?", "ForgotPassword", "Account", null, new { @class = "text-decoration-none small" })
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-login w-100 mb-3">
+                                <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                            </button>
+                        }
+
+                        <div class="divider mb-3">or continue with</div>
+
+                        <div class="d-grid gap-2 mb-3">
+                            <button type="button" class="btn btn-outline-dark social-btn" onclick="alert('Google login coming soon!')">
+                                <i class="fab fa-google me-2"></i>Google
+                            </button>
+                            <button type="button" class="btn btn-outline-primary social-btn" onclick="alert('Facebook login coming soon!')">
+                                <i class="fab fa-facebook-f me-2"></i>Facebook
+                            </button>
+                        </div>
+
+                        <p class="text-center mb-0 mt-3">
+                            Don't have an account?
+                            @Html.ActionLink("Register here", "Register", "Account", null, new { @class = "fw-bold text-decoration-none" })
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- validation loaded from CDN in layout -->
+}

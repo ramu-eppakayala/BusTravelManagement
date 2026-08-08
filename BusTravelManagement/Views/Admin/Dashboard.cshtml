@@ -1,0 +1,346 @@
+@using System.Linq
+@model BusTravelManagement.Models.ViewModels.AdminDashboardViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Admin Dashboard - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .admin-page {
+            background: #f8f9fa;
+            min-height: calc(100vh - 76px - 250px);
+        }
+        .stat-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            padding: 1.25rem;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .stat-card .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        .stat-card .stat-number {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #1a1a2e;
+        }
+        .stat-card .stat-label {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+        .stat-card .stat-change {
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .stat-card .stat-change.up { color: #198754; }
+        .stat-card .stat-change.down { color: #dc3545; }
+        .icon-blue { background: #dbeafe; color: #1d4ed8; }
+        .icon-green { background: #dcfce7; color: #16a34a; }
+        .icon-orange { background: #fef3c7; color: #d97706; }
+        .icon-purple { background: #f3e8ff; color: #7c3aed; }
+        .icon-red { background: #fee2e2; color: #dc2626; }
+        .icon-teal { background: #ccfbf1; color: #0d9488; }
+        .chart-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+        .chart-card .card-header {
+            background: #fff;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 700;
+            padding: 1rem 1.25rem;
+            border-radius: 12px 12px 0 0 !important;
+        }
+        .chart-card .card-body {
+            padding: 1.25rem;
+        }
+        .chart-placeholder {
+            height: 250px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #adb5bd;
+            font-size: 1rem;
+            border: 1px dashed #dee2e6;
+        }
+        .chart-placeholder i {
+            font-size: 2rem;
+            margin-right: 0.75rem;
+        }
+        .recent-bookings-table {
+            font-size: 0.9rem;
+        }
+        .recent-bookings-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #6c757d;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+        .quick-action-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+        .quick-action-card .card-header {
+            background: #fff;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 700;
+            padding: 1rem 1.25rem;
+            border-radius: 12px 12px 0 0 !important;
+        }
+        .quick-action-card .card-body {
+            padding: 1.25rem;
+        }
+        .quick-action-btn {
+            display: block;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            color: #1a1a2e;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .quick-action-btn:hover {
+            background: #f0f7ff;
+            border-color: #0d6efd;
+            color: #0d6efd;
+        }
+        .quick-action-btn i {
+            width: 24px;
+        }
+        @@media (max-width: 768px) {
+            .stat-card .stat-number { font-size: 1.4rem; }
+        }
+    </style>
+}
+
+<div class="admin-page py-4">
+    <div class="container-fluid px-4">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="fw-bold mb-1"><i class="fas fa-shield-alt me-2"></i>Admin Dashboard</h4>
+                <p class="text-muted mb-0">Welcome back, @User.Identity.Name! Here's what's happening today.</p>
+            </div>
+            <div>
+                <span class="text-muted small"><i class="fas fa-calendar me-1"></i>@DateTime.Now.ToString("dd MMM yyyy, dddd")</span>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-xl-2 col-lg-4 col-md-6">
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <div class="stat-number">@Model.TotalUsers</div>
+                            <div class="stat-label">Total Users</div>
+                        </div>
+                        <div class="stat-icon icon-blue"><i class="fas fa-users"></i></div>
+                    </div>
+                    <div class="stat-change up"><i class="fas fa-arrow-up me-1"></i>Total registered</div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-lg-4 col-md-6">
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <div class="stat-number">@Model.TotalOperators</div>
+                            <div class="stat-label">Operators</div>
+                        </div>
+                        <div class="stat-icon icon-green"><i class="fas fa-building"></i></div>
+                    </div>
+                    <div class="stat-change up"><i class="fas fa-check me-1"></i>@Model.TotalOperators total</div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-lg-4 col-md-6">
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <div class="stat-number">@Model.TotalBuses</div>
+                            <div class="stat-label">Buses</div>
+                        </div>
+                        <div class="stat-icon icon-orange"><i class="fas fa-bus"></i></div>
+                    </div>
+                    <div class="stat-change up"><i class="fas fa-check me-1"></i>@Model.TotalBuses total</div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-lg-4 col-md-6">
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <div class="stat-number">@Model.TotalBookingsToday</div>
+                            <div class="stat-label">Today's Bookings</div>
+                        </div>
+                        <div class="stat-icon icon-purple"><i class="fas fa-ticket-alt"></i></div>
+                    </div>
+                    <div class="stat-change up"><i class="fas fa-arrow-up me-1"></i>Today</div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-lg-4 col-md-6">
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <div class="stat-number">₹@Model.TodayRevenue.ToString("N0")</div>
+                            <div class="stat-label">Revenue Today</div>
+                        </div>
+                        <div class="stat-icon icon-green"><i class="fas fa-rupee-sign"></i></div>
+                    </div>
+                    <div class="stat-change up"><i class="fas fa-arrow-up me-1"></i>Today</div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-lg-4 col-md-6">
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <div class="stat-number">₹@Model.MonthlyRevenue.ToString("N0")</div>
+                            <div class="stat-label">Revenue (Monthly)</div>
+                        </div>
+                        <div class="stat-icon icon-red"><i class="fas fa-chart-line"></i></div>
+                    </div>
+                    <div class="stat-change up"><i class="fas fa-arrow-up me-1"></i>This month</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row g-3 mb-4">
+            <div class="col-lg-6">
+                <div class="chart-card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-bar me-2 text-primary"></i>Revenue Chart
+                    </div>
+                    <div class="card-body">
+                        <div id="revenue-chart-root" class="chart-placeholder">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Revenue chart will render here (React component)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="chart-card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-line me-2 text-success"></i>Booking Chart
+                    </div>
+                    <div class="card-body">
+                        <div id="booking-chart-root" class="chart-placeholder">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Booking chart will render here (React component)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Bookings & Quick Actions -->
+        <div class="row g-3">
+            <div class="col-lg-8">
+                <div class="chart-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-clock me-2"></i>Recent Bookings</span>
+                        @Html.ActionLink("View All", "Bookings", "Report", null, new { @class = "btn btn-outline-primary btn-sm" })
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover recent-bookings-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Booking #</th>
+                                        <th>User</th>
+                                        <th>Route</th>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.RecentBookings != null && Model.RecentBookings.Any())
+                                    {
+                                        foreach (var booking in Model.RecentBookings)
+                                        {
+                                            <tr>
+                                                <td><a href="@Url.Action("Detail", "Booking", new { bookingNumber = booking.BookingNumber })" class="text-decoration-none fw-medium">@booking.BookingNumber</a></td>
+                                                <td>@booking.CustomerName</td>
+                                                <td>@booking.Route</td>
+                                                <td>@booking.JourneyDate.ToString("dd MMM")</td>
+                                                <td>₹@booking.Amount.ToString("N2")</td>
+                                                <td>
+                                                    <span class="badge @(booking.Status == "Confirmed" ? "bg-success" : booking.Status == "Cancelled" ? "bg-danger" : booking.Status == "Completed" ? "bg-info" : "bg-warning")">
+                                                        @booking.Status
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted py-3">No recent bookings</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="quick-action-card">
+                    <div class="card-header">
+                        <i class="fas fa-bolt me-2 text-warning"></i>Quick Actions
+                    </div>
+                    <div class="card-body">
+                        <a href="@Url.Action("Users", "Admin")" class="quick-action-btn">
+                            <i class="fas fa-users me-2 text-primary"></i>Manage Users
+                        </a>
+                        <a href="@Url.Action("Operators", "Admin")" class="quick-action-btn">
+                            <i class="fas fa-building me-2 text-success"></i>Manage Operators
+                        </a>
+                        <a href="@Url.Action("Coupons", "Admin")" class="quick-action-btn">
+                            <i class="fas fa-tag me-2 text-warning"></i>Manage Coupons
+                        </a>
+                        <a href="@Url.Action("Reviews", "Admin")" class="quick-action-btn">
+                            <i class="fas fa-star me-2 text-info"></i>Manage Reviews
+                        </a>
+                        <a href="@Url.Action("Reports", "Admin")" class="quick-action-btn">
+                            <i class="fas fa-file-alt me-2 text-danger"></i>Generate Reports
+                        </a>
+                        <a href="#" class="quick-action-btn">
+                            <i class="fas fa-cog me-2 text-secondary"></i>System Settings
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // React components would be initialized here for charts
+            console.log('Admin dashboard ready');
+        });
+    </script>
+}

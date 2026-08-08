@@ -1,0 +1,293 @@
+@model BusTravelManagement.Models.ViewModels.BookingConfirmationViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Booking Confirmed - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .confirmation-page {
+            background: #f8f9fa;
+            min-height: calc(100vh - 76px - 250px);
+        }
+        .success-animation {
+            text-align: center;
+            padding: 2rem 0;
+        }
+        .success-animation .checkmark {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #dcfce7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            animation: scaleIn 0.5s ease-out;
+        }
+        .success-animation .checkmark i {
+            font-size: 2.5rem;
+            color: #16a34a;
+        }
+        @@keyframes scaleIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .success-animation h3 {
+            font-weight: 800;
+            color: #16a34a;
+        }
+        .booking-number {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #1a1a2e;
+            letter-spacing: 2px;
+        }
+        .ticket-summary-card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        .ticket-summary-card .card-header {
+            background: linear-gradient(135deg, #1a1a2e, #0f3460);
+            color: #fff;
+            padding: 1.25rem 1.5rem;
+            border: none;
+        }
+        .ticket-summary-card .card-body {
+            padding: 1.5rem;
+        }
+        .ticket-summary-card .route-large {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+        .ticket-summary-card .route-large .arrow {
+            color: #0d6efd;
+            margin: 0 1rem;
+        }
+        .ticket-summary-card .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .ticket-summary-card .info-row:last-child {
+            border-bottom: none;
+        }
+        .ticket-summary-card .info-row .label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        .ticket-summary-card .info-row .value {
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .action-buttons .btn {
+            border-radius: 10px;
+            padding: 0.6rem 1.25rem;
+            font-weight: 600;
+            flex: 1;
+            min-width: 140px;
+        }
+        .cancellation-policy {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+        }
+        .cancellation-policy h6 {
+            color: #856404;
+            font-weight: 700;
+        }
+        .cancellation-policy ul {
+            margin-bottom: 0;
+            font-size: 0.85rem;
+            color: #856404;
+        }
+        .share-email-link {
+            color: #0d6efd;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .share-email-link:hover {
+            text-decoration: underline;
+        }
+        @@media (max-width: 768px) {
+            .booking-number { font-size: 1.2rem; }
+            .ticket-summary-card .route-large { font-size: 1.1rem; }
+            .action-buttons .btn { min-width: 100%; }
+        }
+    </style>
+}
+
+<div class="confirmation-page py-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Success Animation & Message -->
+                <div class="success-animation">
+                    <div class="checkmark">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <h3>Booking Confirmed!</h3>
+                    <p class="text-muted">Your bus tickets have been booked successfully.</p>
+                    <div class="booking-number">
+                        <i class="fas fa-ticket-alt me-2 text-primary"></i>@Model.BookingNumber
+                    </div>
+                    <p class="text-muted small mt-2">
+                        <i class="fas fa-envelope me-1"></i>A confirmation email has been sent to @Model.ContactEmail
+                    </p>
+                </div>
+
+                <!-- Ticket Summary -->
+                <div class="card ticket-summary-card mb-4">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h5 class="fw-bold mb-0"><i class="fas fa-ticket-alt me-2"></i>Ticket Summary</h5>
+                            </div>
+                            <div class="col-auto">
+                                <span class="badge bg-success px-3 py-2">Confirmed</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6 class="fw-bold">@Model.OperatorName</h6>
+                                <small class="text-muted">@Model.BusNumber</small>
+                            </div>
+                            <div class="col-md-6 text-md-end">
+                                <small class="text-muted">Booking Date</small><br />
+                                <strong>@Model.BookedAt.ToString("dd MMM yyyy, hh:mm tt")</strong>
+                            </div>
+                        </div>
+
+                        <div class="route-large text-center mb-4">
+                            @Model.SourceCity <i class="fas fa-arrow-right arrow"></i> @Model.DestinationCity
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <div class="info-row flex-column align-items-start">
+                                    <span class="label">Departure</span>
+                                    <span class="value">@Model.DepartureTime</span>
+                                    <small class="text-muted">@Model.JourneyDate.ToString("dd MMM yyyy")</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="info-row flex-column align-items-start">
+                                    <span class="label">Arrival</span>
+                                    <span class="value">@Model.ArrivalTime</span>
+                                    <small class="text-muted">@Model.JourneyDate.ToString("dd MMM yyyy")</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="info-row flex-column align-items-start">
+                                    <span class="label">Duration</span>
+                                    <span class="value">
+                                        @Model.Duration
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <div class="info-row flex-column align-items-start">
+                                    <span class="label">Boarding Point</span>
+                                    <span class="value">@Model.BoardingPoint</span>
+                                    <small class="text-muted">@Model.BoardingTime</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-row flex-column align-items-start">
+                                    <span class="label">Dropping Point</span>
+                                    <span class="value">@Model.DroppingPoint</span>
+                                    <small class="text-muted">@Model.DroppingTime</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <div class="info-row flex-column align-items-start">
+                                    <span class="label">Seats</span>
+                                    <span class="value">@string.Join(", ", Model.SeatNumbers)</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-row flex-column align-items-start">
+                                    <span class="label">Passengers</span>
+                                    <span class="value">@Model.NumberOfSeats</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="label">Total Amount Paid</span>
+                            <span class="value" style="font-size:1.3rem;color:#0d6efd;">₹@Model.NetAmount.ToString("N2")</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons mb-4">
+                    <a href="@Url.Action("ViewTicket", "Booking", new { bookingNumber = Model.BookingNumber })" class="btn btn-primary">
+                        <i class="fas fa-eye me-2"></i>View E-Ticket
+                    </a>
+                    <a href="#" class="btn btn-outline-primary" onclick="window.print();return false;">
+                        <i class="fas fa-print me-2"></i>Print Ticket
+                    </a>
+                    <a href="@Url.Action("DownloadTicket", "Booking", new { bookingNumber = Model.BookingNumber })" class="btn btn-outline-success">
+                        <i class="fas fa-download me-2"></i>Download PDF
+                    </a>
+                    <a href="#" class="btn btn-outline-info" onclick="alert('Share via email feature coming soon!');return false;">
+                        <i class="fas fa-share-alt me-2"></i>Share via Email
+                    </a>
+                </div>
+
+                <!-- Cancellation Policy -->
+                <div class="cancellation-policy mb-4">
+                    <h6><i class="fas fa-info-circle me-2"></i>Cancellation Policy</h6>
+                    <ul>
+                        <li>Free cancellation up to 4 hours before departure.</li>
+                        <li>25% charge for cancellation between 1-4 hours before departure.</li>
+                        <li>50% charge for cancellation less than 1 hour before departure.</li>
+                        <li>No refund for no-show.</li>
+                    </ul>
+                    <div class="mt-2">
+                        @Html.ActionLink("Cancel Booking", "Cancel", "Booking", new { bookingNumber = Model.BookingNumber }, new { @class = "btn btn-outline-danger btn-sm", onclick = "return confirm('Are you sure you want to cancel this booking? Cancellation charges may apply.');" })
+                    </div>
+                </div>
+
+                <div class="text-center mb-4">
+                    <a href="/" class="btn btn-outline-secondary me-2">
+                        <i class="fas fa-home me-1"></i>Back to Home
+                    </a>
+                    <a href="@Url.Action("MyBookings", "Account")" class="btn btn-outline-primary">
+                        <i class="fas fa-list me-1"></i>My Bookings
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Confetti-like celebration effect placeholder
+            console.log('Booking confirmed: @Model.BookingNumber');
+        });
+    </script>
+}

@@ -1,0 +1,239 @@
+@model BusTravelManagement.Models.ViewModels.RegisterViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Register - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .register-page {
+            min-height: calc(100vh - 76px - 250px);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9edf5 100%);
+        }
+        .register-card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
+        .register-card .card-header {
+            background: linear-gradient(135deg, #1a1a2e, #0f3460);
+            color: #fff;
+            border-radius: 16px 16px 0 0 !important;
+            padding: 1.5rem;
+            text-align: center;
+            border: none;
+        }
+        .register-card .card-body {
+            padding: 2rem;
+        }
+        .register-card .form-control,
+        .register-card .form-select {
+            padding: 0.6rem 1rem;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            transition: border-color 0.3s;
+        }
+        .register-card .form-control:focus,
+        .register-card .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: none;
+        }
+        .register-card .form-control.is-invalid,
+        .register-card .form-select.is-invalid {
+            border-color: #dc3545;
+        }
+        .register-card .btn-register {
+            padding: 0.7rem;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        .email-check {
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+        .email-check.available { color: #198754; }
+        .email-check.unavailable { color: #dc3545; }
+        .password-strength {
+            height: 4px;
+            border-radius: 2px;
+            margin-top: 0.5rem;
+            transition: all 0.3s;
+        }
+        .gender-select {
+            display: flex;
+            gap: 1rem;
+            padding: 0.5rem 0;
+        }
+        .gender-select .form-check-inline {
+            margin-right: 0;
+        }
+        .gender-select .form-check-input:checked ~ .form-check-label {
+            color: #0d6efd;
+            font-weight: 600;
+        }
+        @@media (max-width: 576px) {
+            .register-card .card-body { padding: 1.5rem; }
+        }
+    </style>
+}
+
+<div class="register-page py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card register-card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-user-plus me-2"></i>Create Account</h4>
+                        <p class="mb-0 small opacity-75">Join BusTravel for the best travel experience</p>
+                    </div>
+                    <div class="card-body">
+                        @Html.ValidationSummary(true, "", new { @class = "alert alert-danger", role = "alert" })
+
+                        @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { role = "form" }))
+                        {
+                            @Html.AntiForgeryToken()
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    @Html.LabelFor(m => m.FirstName, new { @class = "form-label fw-medium" })
+                                    @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control", placeholder = "First name" })
+                                    @Html.ValidationMessageFor(m => m.FirstName, "", new { @class = "invalid-feedback d-block" })
+                                </div>
+                                <div class="col-md-6">
+                                    @Html.LabelFor(m => m.LastName, new { @class = "form-label fw-medium" })
+                                    @Html.TextBoxFor(m => m.LastName, new { @class = "form-control", placeholder = "Last name" })
+                                    @Html.ValidationMessageFor(m => m.LastName, "", new { @class = "invalid-feedback d-block" })
+                                </div>
+                                <div class="col-md-6">
+                                    @Html.LabelFor(m => m.Email, new { @class = "form-label fw-medium" })
+                                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "you@example.com", id = "registerEmail" })
+                                    <div id="emailCheckMessage" class="email-check"></div>
+                                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "invalid-feedback d-block" })
+                                </div>
+                                <div class="col-md-6">
+                                    @Html.LabelFor(m => m.PhoneNumber, new { @class = "form-label fw-medium" })
+                                    @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", placeholder = "+91 9876543210", type = "tel" })
+                                    @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "invalid-feedback d-block" })
+                                </div>
+                                <div class="col-md-6">
+                                    @Html.LabelFor(m => m.Password, new { @class = "form-label fw-medium" })
+                                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Create a password", id = "registerPassword" })
+                                    <div class="password-strength bg-secondary" id="passwordStrength"></div>
+                                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "invalid-feedback d-block" })
+                                </div>
+                                <div class="col-md-6">
+                                    @Html.LabelFor(m => m.ConfirmPassword, new { @class = "form-label fw-medium" })
+                                    @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", placeholder = "Confirm password" })
+                                    @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "invalid-feedback d-block" })
+                                </div>
+                                <div class="col-md-6">
+                                    @Html.LabelFor(m => m.DateOfBirth, new { @class = "form-label fw-medium" })
+                                    @Html.TextBoxFor(m => m.DateOfBirth, new { @class = "form-control", type = "date" })
+                                    @Html.ValidationMessageFor(m => m.DateOfBirth, "", new { @class = "invalid-feedback d-block" })
+                                </div>
+                                <div class="col-md-6">
+                                    @Html.LabelFor(m => m.Gender, new { @class = "form-label fw-medium" })
+                                    <div class="gender-select">
+                                        <div class="form-check form-check-inline">
+                                            @Html.RadioButtonFor(m => m.Gender, "Male", new { @class = "form-check-input", id = "genderMale" })
+                                            <label class="form-check-label" for="genderMale">
+                                                <i class="fas fa-male me-1"></i>Male
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            @Html.RadioButtonFor(m => m.Gender, "Female", new { @class = "form-check-input", id = "genderFemale" })
+                                            <label class="form-check-label" for="genderFemale">
+                                                <i class="fas fa-female me-1"></i>Female
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            @Html.RadioButtonFor(m => m.Gender, "Other", new { @class = "form-check-input", id = "genderOther" })
+                                            <label class="form-check-label" for="genderOther">Other</label>
+                                        </div>
+                                    </div>
+                                    @Html.ValidationMessageFor(m => m.Gender, "", new { @class = "invalid-feedback d-block" })
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        @Html.CheckBoxFor(m => m.AcceptTerms, new { @class = "form-check-input" })
+                                        @Html.LabelFor(m => m.AcceptTerms, new { @class = "form-check-label" })
+                                        <span class="text-muted small">I agree to the @Html.ActionLink("Terms & Conditions", "Terms", "Home") and @Html.ActionLink("Privacy Policy", "Privacy", "Home")</span>
+                                        @Html.ValidationMessageFor(m => m.AcceptTerms, "", new { @class = "invalid-feedback d-block" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-register w-100 mt-3">
+                                <i class="fas fa-user-plus me-2"></i>Create Account
+                            </button>
+                        }
+
+                        <p class="text-center mb-0 mt-3">
+                            Already have an account?
+                            @Html.ActionLink("Sign in", "Login", "Account", null, new { @class = "fw-bold text-decoration-none" })
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- validation loaded from CDN in layout -->
+    <script>
+        $(document).ready(function () {
+            // Email availability check
+            var emailTimer;
+            $('#registerEmail').on('input', function () {
+                clearTimeout(emailTimer);
+                var email = $(this).val();
+                var msg = $('#emailCheckMessage');
+                if (email.length < 5 || !email.includes('@@')) {
+                    msg.removeClass('available unavailable').empty();
+                    return;
+                }
+                emailTimer = setTimeout(function () {
+                    $.ajax({
+                        url: '/Account/CheckEmailAvailability',
+                        type: 'GET',
+                        data: { email: email },
+                        success: function (response) {
+                            if (response.available) {
+                                msg.html('<i class="fas fa-check-circle me-1"></i>Email available').addClass('available').removeClass('unavailable');
+                            } else {
+                                msg.html('<i class="fas fa-times-circle me-1"></i>Email already registered').addClass('unavailable').removeClass('available');
+                            }
+                        },
+                        error: function () {
+                            msg.empty().removeClass('available unavailable');
+                        }
+                    });
+                }, 500);
+            });
+
+            // Password strength indicator
+            $('#registerPassword').on('input', function () {
+                var pwd = $(this).val();
+                var strength = 0;
+                if (pwd.length >= 8) strength += 25;
+                if (pwd.match(/[a-z]/) && pwd.match(/[A-Z]/)) strength += 25;
+                if (pwd.match(/\d/)) strength += 25;
+                if (pwd.match(/[^a-zA-Z\d]/)) strength += 25;
+
+                var bar = $('#passwordStrength');
+                bar.css('width', strength + '%');
+                if (strength < 25) {
+                    bar.removeClass('bg-warning bg-success bg-info').addClass('bg-danger');
+                } else if (strength < 50) {
+                    bar.removeClass('bg-danger bg-success bg-info').addClass('bg-warning');
+                } else if (strength < 75) {
+                    bar.removeClass('bg-danger bg-warning bg-success').addClass('bg-info');
+                } else {
+                    bar.removeClass('bg-danger bg-warning bg-info').addClass('bg-success');
+                }
+            });
+        });
+    </script>
+}

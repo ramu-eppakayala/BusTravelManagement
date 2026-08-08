@@ -1,0 +1,105 @@
+@model BusTravelManagement.Models.ViewModels.CreateBusViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Add Bus - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .form-section { padding: 2rem 0; background: #f8f9fa; min-height: calc(100vh - 76px - 250px); }
+        .form-card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .form-card .card-header { background: linear-gradient(135deg, #1a1a2e, #0f3460); color: #fff; border-radius: 12px 12px 0 0 !important; padding: 1.25rem 1.5rem; }
+        .form-card .card-header h5 { margin: 0; font-weight: 700; }
+        .form-card .card-body { padding: 2rem; }
+        .form-card .form-label { font-weight: 600; color: #1a1a2e; }
+        .form-card .form-control, .form-card .form-select { padding: 0.6rem 1rem; border-radius: 8px; border: 2px solid #e9ecef; }
+        .form-card .form-control:focus, .form-card .form-select:focus { border-color: #0d6efd; box-shadow: none; }
+        .btn-submit { padding: 0.6rem 2rem; border-radius: 8px; font-weight: 600; }
+    </style>
+}
+
+<div class="form-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-plus-circle me-2"></i>Add New Bus</h5>
+                    </div>
+                    <div class="card-body">
+                        @using (Html.BeginForm("CreateBus", "Operator", FormMethod.Post, new { role = "form" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Bus Number</label>
+                                    @Html.TextBoxFor(m => m.BusNumber, new { @class = "form-control", placeholder = "e.g., MH-01-AB-1234" })
+                                    @Html.ValidationMessageFor(m => m.BusNumber, "", new { @class = "text-danger small" })
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Registration Number</label>
+                                    @Html.TextBoxFor(m => m.RegistrationNumber, new { @class = "form-control", placeholder = "e.g., MH-01-AB-1234" })
+                                    @Html.ValidationMessageFor(m => m.RegistrationNumber, "", new { @class = "text-danger small" })
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Bus Type</label>
+                                    @Html.DropDownListFor(m => m.BusTypeId, (SelectList)ViewBag.BusTypes, "Select Bus Type", new { @class = "form-select" })
+                                    @Html.ValidationMessageFor(m => m.BusTypeId, "", new { @class = "text-danger small" })
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Seat Layout Type</label>
+                                    @Html.DropDownListFor(m => m.SeatLayoutType, new SelectList(new[] { "2x2", "2x1", "1x2", "3x2", "2x3", "Sleeper" }), "Select Layout", new { @class = "form-select" })
+                                    @Html.ValidationMessageFor(m => m.SeatLayoutType, "", new { @class = "text-danger small" })
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Total Seats</label>
+                                    @Html.TextBoxFor(m => m.TotalSeats, new { @class = "form-control", type = "number", min = "1" })
+                                    @Html.ValidationMessageFor(m => m.TotalSeats, "", new { @class = "text-danger small" })
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">&nbsp;</label>
+                                    <div class="form-check">
+                                        @Html.CheckBoxFor(m => m.IsAC, new { @class = "form-check-input" })
+                                        <label class="form-check-label">AC Bus</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">&nbsp;</label>
+                                    <div class="form-check">
+                                        @Html.CheckBoxFor(m => m.IsSleeper, new { @class = "form-check-input" })
+                                        <label class="form-check-label">Sleeper Bus</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Amenities</label>
+                                    <div class="row">
+                                        @if (ViewBag.Amenities != null)
+                                        {
+                                            var amenities = (IEnumerable<SelectListItem>)ViewBag.Amenities;
+                                            foreach (var amenity in amenities)
+                                            {
+                                                <div class="col-md-4">
+                                                    <div class="form-check">
+                                                        <input type="checkbox" name="AmenityIds" value="@amenity.Value" class="form-check-input" id="amenity_@amenity.Value" />
+                                                        <label class="form-check-label" for="amenity_@amenity.Value">@amenity.Text</label>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 text-end">
+                                <a href="@Url.Action("Buses", "Operator")" class="btn btn-outline-secondary btn-submit me-2">Cancel</a>
+                                <button type="submit" class="btn btn-primary btn-submit"><i class="fas fa-save me-2"></i>Save Bus</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

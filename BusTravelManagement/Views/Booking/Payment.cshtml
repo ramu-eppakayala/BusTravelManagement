@@ -1,0 +1,410 @@
+@model BusTravelManagement.Models.ViewModels.PaymentRequestViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Payment - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .payment-page {
+            background: #f8f9fa;
+            min-height: calc(100vh - 76px - 250px);
+        }
+        .payment-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            margin-bottom: 1.5rem;
+        }
+        .payment-card .card-header {
+            background: #fff;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 700;
+            padding: 1rem 1.5rem;
+            border-radius: 12px 12px 0 0 !important;
+        }
+        .payment-card .card-body {
+            padding: 1.5rem;
+        }
+        .order-summary {
+            background: linear-gradient(135deg, #1a1a2e, #0f3460);
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            color: #fff;
+        }
+        .order-summary .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .order-summary .summary-row.total {
+            font-weight: 800;
+            font-size: 1.3rem;
+            border-top: 1px solid rgba(255,255,255,0.3);
+            padding-top: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        .payment-method-card {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 0.75rem;
+        }
+        .payment-method-card:hover {
+            border-color: #0d6efd;
+        }
+        .payment-method-card.selected {
+            border-color: #0d6efd;
+            background: #f0f7ff;
+        }
+        .payment-method-card .method-icon {
+            font-size: 1.5rem;
+            width: 40px;
+            text-align: center;
+        }
+        .payment-method-card .method-name {
+            font-weight: 600;
+        }
+        .payment-method-card .form-check-input:checked {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        .card-details-form {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+        .card-details-form .form-control {
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+        .card-details-form .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: none;
+        }
+        .card-details-form .input-group-text {
+            background: #fff;
+            border: 2px solid #e9ecef;
+            border-right: none;
+        }
+        .card-details-form .input-group .form-control {
+            border-left: none;
+        }
+        .btn-pay {
+            padding: 0.75rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .secure-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #dcfce7;
+            color: #166534;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .secure-badge i {
+            font-size: 1.1rem;
+        }
+        .amount-display {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #1a1a2e;
+        }
+        @@media (max-width: 768px) {
+            .payment-card .card-body { padding: 1rem; }
+            .amount-display { font-size: 1.5rem; }
+        }
+    </style>
+}
+
+<div class="payment-page py-4">
+    <div class="container">
+        <div class="row">
+            <!-- Payment Form -->
+            <div class="col-lg-8 mb-4 mb-lg-0">
+                <div class="payment-card">
+                    <div class="card-header">
+                        <i class="fas fa-credit-card me-2"></i>Payment Method
+                    </div>
+                    <div class="card-body">
+                        @Html.ValidationSummary(true, "", new { @class = "alert alert-danger", role = "alert" })
+
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+
+                        @using (Html.BeginForm("Payment", "Booking", FormMethod.Post, new { role = "form", id = "paymentForm" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(m => m.BookingNumber)
+                            @Html.HiddenFor(m => m.Amount)
+
+                            <div class="mb-2">
+                                <label class="form-label fw-medium">Select Payment Method</label>
+                            </div>
+
+                            <!-- Credit Card -->
+                            <label class="payment-method-card d-flex align-items-center" id="method-creditcard">
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="radio" name="PaymentMethod" value="CreditCard" id="pmCreditCard" />
+                                </div>
+                                <div class="method-icon ms-2">
+                                    <i class="fas fa-credit-card text-primary"></i>
+                                </div>
+                                <div class="method-name ms-2">Credit Card</div>
+                            </label>
+
+                            <!-- Debit Card -->
+                            <label class="payment-method-card d-flex align-items-center" id="method-debitcard">
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="radio" name="PaymentMethod" value="DebitCard" id="pmDebitCard" />
+                                </div>
+                                <div class="method-icon ms-2">
+                                    <i class="fas fa-credit-card text-success"></i>
+                                </div>
+                                <div class="method-name ms-2">Debit Card</div>
+                            </label>
+
+                            <!-- Net Banking -->
+                            <label class="payment-method-card d-flex align-items-center" id="method-netbanking">
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="radio" name="PaymentMethod" value="NetBanking" id="pmNetBanking" />
+                                </div>
+                                <div class="method-icon ms-2">
+                                    <i class="fas fa-university text-warning"></i>
+                                </div>
+                                <div class="method-name ms-2">Net Banking</div>
+                            </label>
+
+                            <!-- UPI -->
+                            <label class="payment-method-card d-flex align-items-center" id="method-upi">
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="radio" name="PaymentMethod" value="UPI" id="pmUPI" />
+                                </div>
+                                <div class="method-icon ms-2">
+                                    <i class="fas fa-mobile-alt text-info"></i>
+                                </div>
+                                <div class="method-name ms-2">UPI</div>
+                            </label>
+
+                            <!-- Wallet -->
+                            <label class="payment-method-card d-flex align-items-center" id="method-wallet">
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="radio" name="PaymentMethod" value="Wallet" id="pmWallet" />
+                                </div>
+                                <div class="method-icon ms-2">
+                                    <i class="fas fa-wallet text-danger"></i>
+                                </div>
+                                <div class="method-name ms-2">Wallet</div>
+                            </label>
+
+                            <!-- Card Details Form -->
+                            <div class="card-details-form" id="cardDetailsForm" style="display:none;">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label fw-medium">Cardholder Name</label>
+                                        <input type="text" name="CardholderName" class="form-control" placeholder="Name on card" />
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-medium">Card Number</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-credit-card"></i></span>
+                                            <input type="text" name="CardNumber" class="form-control" placeholder="XXXX XXXX XXXX XXXX" maxlength="19" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-medium">Expiry Date</label>
+                                        <input type="text" name="ExpiryDate" class="form-control" placeholder="MM/YY" maxlength="5" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-medium">CVV</label>
+                                        <div class="input-group">
+                                            <input type="password" name="CVV" class="form-control" placeholder="***" maxlength="4" />
+                                            <span class="input-group-text"><i class="fas fa-question-circle text-muted" title="3 or 4 digit security code"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- UPI Form -->
+                            <div class="card-details-form" id="upiForm" style="display:none;">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label fw-medium">UPI ID</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-at"></i></span>
+                                            <input type="text" name="UpiId" class="form-control" placeholder="example@upi" />
+                                        </div>
+                                        <small class="text-muted">Enter your UPI ID (e.g., name@paytm, name@googlepay)</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Net Banking Form -->
+                            <div class="card-details-form" id="netBankingForm" style="display:none;">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label fw-medium">Select Bank</label>
+                                        <select name="BankName" class="form-select">
+                                            <option value="">-- Select Bank --</option>
+                                            <option value="SBI">State Bank of India</option>
+                                            <option value="HDFC">HDFC Bank</option>
+                                            <option value="ICICI">ICICI Bank</option>
+                                            <option value="Axis">Axis Bank</option>
+                                            <option value="Kotak">Kotak Mahindra Bank</option>
+                                            <option value="Yes">Yes Bank</option>
+                                            <option value="PNB">Punjab National Bank</option>
+                                            <option value="BOB">Bank of Baroda</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mock Gateway / Complete Payment -->
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-primary btn-pay w-100">
+                                    <i class="fas fa-lock me-2"></i>Pay ₹@Model.Amount.ToString("N2")
+                                </button>
+                                <div class="text-center mt-3">
+                                    <span class="secure-badge">
+                                        <i class="fas fa-shield-alt"></i> Secured with 256-bit SSL encryption
+                                    </span>
+                                </div>
+                                <p class="text-center text-muted small mt-2 mb-0">
+                                    <i class="fas fa-lock me-1"></i>Your payment information is encrypted and secure.
+                                    We do not store your card details.
+                                </p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary Sidebar -->
+            <div class="col-lg-4">
+                <div class="payment-card">
+                    <div class="card-header">
+                        <i class="fas fa-receipt me-2"></i>Order Summary
+                    </div>
+                    <div class="card-body">
+                        <div class="order-summary">
+                            <h6 class="fw-bold mb-3">
+                                <i class="fas fa-bus me-2"></i>@Model.OperatorName
+                            </h6>
+                            <div class="summary-row">
+                                <span>Bus Number</span>
+                                <span>@Model.BusNumber</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Route</span>
+                                <span>@Model.SourceCity → @Model.DestinationCity</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Date</span>
+                                <span>@Model.TravelDate.ToString("dd MMM yyyy")</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Time</span>
+                                <span>@Model.DepartureTime - @Model.ArrivalTime</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Seats</span>
+                                <span>@string.Join(", ", Model.SelectedSeats)</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Passengers</span>
+                                <span>@Model.SelectedSeats.Count</span>
+                            </div>
+                            <div class="summary-row total">
+                                <span>Amount</span>
+                                <span>₹@Model.Amount.ToString("N2")</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                <small>Free cancellation up to 4 hours before departure</small>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                <small>Instant e-ticket via email & SMS</small>
+                            </div>
+                        </div>
+
+                        <hr />
+                        <h6 class="fw-bold mb-2">Accepted Payment Methods</h6>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <span class="badge bg-light text-dark p-2"><i class="fab fa-cc-visa fa-2x"></i></span>
+                            <span class="badge bg-light text-dark p-2"><i class="fab fa-cc-mastercard fa-2x"></i></span>
+                            <span class="badge bg-light text-dark p-2"><i class="fab fa-cc-amex fa-2x"></i></span>
+                            <span class="badge bg-light text-dark p-2"><i class="fab fa-google-pay fa-2x"></i></span>
+                            <span class="badge bg-light text-dark p-2"><i class="fab fa-paypal fa-2x"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- validation loaded from CDN in layout -->
+    <script>
+        $(document).ready(function () {
+            // Payment method selection
+            $('.payment-method-card').on('click', function () {
+                $('.payment-method-card').removeClass('selected');
+                $(this).addClass('selected');
+                $(this).find('.form-check-input').prop('checked', true);
+
+                var method = $(this).find('.form-check-input').val();
+                $('#cardDetailsForm, #upiForm, #netBankingForm').hide();
+
+                if (method === 'CreditCard' || method === 'DebitCard') {
+                    $('#cardDetailsForm').show();
+                } else if (method === 'UPI') {
+                    $('#upiForm').show();
+                } else if (method === 'NetBanking') {
+                    $('#netBankingForm').show();
+                }
+            });
+
+            // Card number formatting
+            $('input[name="CardNumber"]').on('input', function () {
+                var val = $(this).val().replace(/\D/g, '');
+                var formatted = val.replace(/(\d{4})(?=\d)/g, '$1 ');
+                $(this).val(formatted);
+            });
+
+            // Expiry date formatting
+            $('input[name="ExpiryDate"]').on('input', function () {
+                var val = $(this).val().replace(/\D/g, '');
+                if (val.length >= 2) {
+                    val = val.substring(0, 2) + '/' + val.substring(2, 4);
+                }
+                $(this).val(val);
+            });
+
+            // CVV numeric only
+            $('input[name="CVV"]').on('input', function () {
+                $(this).val($(this).val().replace(/\D/g, ''));
+            });
+        });
+    </script>
+}

@@ -1,0 +1,132 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "404 - Page Not Found - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .notfound-page {
+            min-height: calc(100vh - 76px - 250px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+        }
+        .notfound-container {
+            text-align: center;
+            max-width: 600px;
+            padding: 2rem;
+        }
+        .notfound-code {
+            font-size: 8rem;
+            font-weight: 900;
+            color: #e9ecef;
+            line-height: 1;
+            margin-bottom: 0;
+        }
+        .notfound-illustration {
+            margin: -2rem 0 1rem;
+            position: relative;
+        }
+        .notfound-illustration img {
+            max-width: 300px;
+        }
+        .notfound-illustration-placeholder {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #e9ecef, #dee2e6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            color: #adb5bd;
+        }
+        .notfound-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #1a1a2e;
+            margin-bottom: 0.75rem;
+        }
+        .notfound-message {
+            color: #6c757d;
+            font-size: 1.05rem;
+            margin-bottom: 2rem;
+        }
+        .btn-home {
+            padding: 0.7rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        .search-suggestions {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            text-align: left;
+        }
+        .search-suggestions h6 {
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 1rem;
+        }
+        .search-suggestions ul {
+            margin-bottom: 0;
+            padding-left: 1.25rem;
+        }
+        .search-suggestions li {
+            margin-bottom: 0.5rem;
+        }
+        .search-suggestions li:last-child {
+            margin-bottom: 0;
+        }
+        .search-suggestions a {
+            color: #0d6efd;
+            text-decoration: none;
+        }
+        .search-suggestions a:hover {
+            text-decoration: underline;
+        }
+    </style>
+}
+
+<div class="notfound-page">
+    <div class="notfound-container">
+        <div class="notfound-code">404</div>
+        <div class="notfound-illustration">
+            <div class="notfound-illustration-placeholder">
+                <i class="fas fa-map-signs"></i>
+            </div>
+        </div>
+        <h1 class="notfound-title">Page Not Found</h1>
+        <p class="notfound-message">
+            The page you're looking for doesn't exist or has been moved.
+            Let us help you get back on track.
+        </p>
+        <div class="d-flex gap-3 justify-content-center">
+            <a href="/" class="btn btn-primary btn-home">
+                <i class="fas fa-home me-2"></i>Go to Home
+            </a>
+            <a href="/Search" class="btn btn-outline-primary btn-home">
+                <i class="fas fa-search me-2"></i>Search Buses
+            </a>
+        </div>
+        <div class="search-suggestions">
+            <h6><i class="fas fa-lightbulb me-2 text-warning"></i>You might be looking for:</h6>
+            <ul>
+                <li>@Html.ActionLink("Search for bus tickets", "Index", "Search")</li>
+                <li>@Html.ActionLink("View your bookings", "MyBookings", "Account")</li>
+                <li>@Html.ActionLink("Popular bus routes", "Index", "Home")</li>
+                <li>@Html.ActionLink("Contact our support team", "Contact", "Home")</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        console.log('404 error: Page not found');
+    </script>
+}

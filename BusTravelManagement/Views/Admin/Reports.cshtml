@@ -1,0 +1,65 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Reports - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .admin-section { padding: 2rem 0; background: #f8f9fa; min-height: calc(100vh - 76px - 250px); }
+        .report-card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 2rem; text-align: center; height: 100%; text-decoration: none; display: block; color: inherit; transition: transform 0.2s; }
+        .report-card:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.1); color: inherit; }
+        .report-card .icon { font-size: 2.5rem; color: #0d6efd; margin-bottom: 1rem; }
+        .report-card h5 { font-weight: 700; }
+        .report-card p { color: #6c757d; font-size: 0.9rem; margin: 0; }
+    </style>
+}
+
+<div class="admin-section">
+    <div class="container-fluid px-4">
+        <h4 class="fw-bold mb-4"><i class="fas fa-chart-bar me-2"></i>Reports Dashboard</h4>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <a href="@Url.Action("Daily", "Report")" class="report-card">
+                    <div class="icon"><i class="fas fa-calendar-day"></i></div>
+                    <h5>Daily Report</h5>
+                    <p>View daily booking and revenue data</p>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="@Url.Action("Monthly", "Report")" class="report-card">
+                    <div class="icon"><i class="fas fa-calendar-alt"></i></div>
+                    <h5>Monthly Report</h5>
+                    <p>Monthly performance analytics</p>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="@Url.Action("Yearly", "Report")" class="report-card">
+                    <div class="icon"><i class="fas fa-calendar"></i></div>
+                    <h5>Yearly Report</h5>
+                    <p>Year-over-year comparisons</p>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="@Url.Action("Bookings", "Report")" class="report-card">
+                    <div class="icon"><i class="fas fa-ticket-alt"></i></div>
+                    <h5>Booking Report</h5>
+                    <p>Detailed booking analytics</p>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="@Url.Action("Cancellations", "Report")" class="report-card">
+                    <div class="icon"><i class="fas fa-times-circle"></i></div>
+                    <h5>Cancellation Report</h5>
+                    <p>Cancellation trends and refunds</p>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="@Url.Action("Operator", "Report")" class="report-card">
+                    <div class="icon"><i class="fas fa-building"></i></div>
+                    <h5>Operator Report</h5>
+                    <p>Operator performance metrics</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

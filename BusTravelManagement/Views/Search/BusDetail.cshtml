@@ -1,0 +1,641 @@
+@using System.Linq
+@model BusTravelManagement.Models.ViewModels.BusDetailViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = @Model.OperatorName + " - Bus Detail - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .bus-detail-page {
+            background: #f8f9fa;
+            min-height: calc(100vh - 76px - 250px);
+        }
+        .bus-header {
+            background: linear-gradient(135deg, #1a1a2e, #0f3460);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            color: #fff;
+            margin-bottom: 1.5rem;
+        }
+        .bus-header .bus-operator-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        .bus-header .bus-number {
+            font-size: 1rem;
+            opacity: 0.85;
+        }
+        .bus-header .bus-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .bus-header .bus-badge.ac { background: rgba(255,255,255,0.2); color: #fff; }
+        .bus-header .bus-badge.sleeper { background: rgba(255,255,255,0.2); color: #fff; }
+        .bus-header .rating-stars {
+            color: #ffc107;
+        }
+        .bus-header .rating-number {
+            background: #198754;
+            color: #fff;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        .detail-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            margin-bottom: 1.5rem;
+        }
+        .detail-card .card-header {
+            background: #fff;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 700;
+            padding: 1rem 1.5rem;
+            border-radius: 12px 12px 0 0 !important;
+        }
+        .detail-card .card-body {
+            padding: 1.5rem;
+        }
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #dee2e6;
+        }
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+        .timeline-item .dot {
+            position: absolute;
+            left: -1.65rem;
+            top: 0.25rem;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #0d6efd;
+            border: 3px solid #fff;
+            box-shadow: 0 0 0 2px #0d6efd;
+        }
+        .timeline-item:first-child .dot {
+            background: #198754;
+            box-shadow: 0 0 0 2px #198754;
+        }
+        .timeline-item:last-child .dot {
+            background: #dc3545;
+            box-shadow: 0 0 0 2px #dc3545;
+        }
+        .timeline-item .time {
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+        .timeline-item .station {
+            color: #6c757d;
+        }
+        .boarding-point {
+            padding: 0.75rem 1rem;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .boarding-point:hover {
+            border-color: #0d6efd;
+            background: #f0f7ff;
+        }
+        .boarding-point .point-time {
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+        .boarding-point .point-address {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        .amenity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+        }
+        .amenity-item {
+            text-align: center;
+            padding: 1rem 0.5rem;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .amenity-item:hover {
+            border-color: #0d6efd;
+        }
+        .amenity-item i {
+            font-size: 1.5rem;
+            color: #0d6efd;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        .amenity-item span {
+            font-size: 0.8rem;
+            color: #495057;
+        }
+        .fare-card {
+            background: linear-gradient(135deg, #0d6efd, #0a58ca);
+            color: #fff;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        .fare-card .fare-amount {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+        .fare-breakdown {
+            border-top: 1px solid rgba(255,255,255,0.2);
+            margin-top: 1rem;
+            padding-top: 1rem;
+        }
+        .fare-breakdown .row {
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+        .btn-select-seats {
+            padding: 0.7rem 2rem;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+        .review-card {
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        .review-card .reviewer-name {
+            font-weight: 600;
+        }
+        .review-card .review-date {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        .review-card .review-text {
+            color: #495057;
+            margin-top: 0.5rem;
+        }
+        .review-stars {
+            color: #ffc107;
+            font-size: 0.9rem;
+        }
+        .rating-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .rating-bar .bar-label {
+            min-width: 60px;
+            font-size: 0.85rem;
+        }
+        .rating-bar .progress {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+        }
+        .rating-bar .bar-count {
+            min-width: 30px;
+            text-align: right;
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        .seat-layout-placeholder {
+            border: 2px dashed #dee2e6;
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            background: #f8f9fa;
+        }
+        .seat-layout-placeholder i {
+            font-size: 3rem;
+            color: #adb5bd;
+            display: block;
+            margin-bottom: 1rem;
+        }
+        @@media (max-width: 768px) {
+            .bus-header { padding: 1.25rem; }
+            .bus-header .bus-operator-name { font-size: 1.2rem; }
+            .amenity-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+        }
+    </style>
+}
+
+<div class="bus-detail-page py-4">
+    <div class="container">
+        <!-- Bus Header -->
+        <div class="bus-header">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-3 mb-lg-0">
+                    <div class="d-flex align-items-center mb-2">
+                        <img src="@Model.OperatorLogo" alt="@Model.OperatorName" class="me-3"
+                             style="width:48px;height:48px;object-fit:contain;background:#fff;border-radius:8px;padding:4px;"
+                             onerror="this.style.display='none'" />
+                        <div>
+                            <div class="bus-operator-name">@Model.OperatorName</div>
+                            <div class="bus-number">@Model.BusNumber</div>
+                        </div>
+                    </div>
+                    <div>
+                        @if (Model.IsAC)
+                        {
+                            <span class="bus-badge ac me-2"><i class="fas fa-snowflake me-1"></i>AC</span>
+                        }
+                        else
+                        {
+                            <span class="bus-badge ac me-2" style="background:rgba(255,255,255,0.15);"><i class="fas fa-fan me-1"></i>Non-AC</span>
+                        }
+                        @if (Model.IsSleeper)
+                        {
+                            <span class="bus-badge sleeper me-2"><i class="fas fa-bed me-1"></i>Sleeper</span>
+                        }
+                        @if (!Model.IsSleeper)
+                        {
+                            <span class="bus-badge sleeper me-2"><i class="fas fa-chair me-1"></i>Seater</span>
+                        }
+                    </div>
+                </div>
+                <div class="col-lg-3 mb-3 mb-lg-0">
+                    <div class="text-lg-center">
+                        <div class="rating-number d-inline-block me-2">@Model.Rating.ToString("F1")</div>
+                        <div class="rating-stars d-inline-block">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                if (i <= Math.Floor(Model.Rating))
+                                {
+                                    <i class="fas fa-star"></i>
+                                }
+                                else if (i == Math.Ceiling(Model.Rating) && Model.Rating % 1 >= 0.5)
+                                {
+                                    <i class="fas fa-star-half-alt"></i>
+                                }
+                                else
+                                {
+                                    <i class="far fa-star"></i>
+                                }
+                            }
+                        </div>
+                        <div class="mt-1">
+                            <small>@Model.ReviewCount reviews</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 text-lg-end">
+                    <div class="fare-card d-inline-block text-center">
+                        <small>Starting from</small>
+                        <div class="fare-amount">₹@Model.BaseFare.ToString("N0")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <!-- Route Timeline -->
+                <div class="card detail-card">
+                    <div class="card-header">
+                        <i class="fas fa-route me-2"></i>Route Timeline
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            @if (Model.Stops != null)
+                            {
+                                foreach (var stop in Model.Stops)
+                                {
+                                    <div class="timeline-item">
+                                        <div class="dot"></div>
+                                        <div class="time">@stop.ArrivalTime</div>
+                                        <div class="station">@stop.StopName</div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Boarding Points -->
+                <div class="card detail-card">
+                    <div class="card-header">
+                        <i class="fas fa-arrow-up me-2 text-success"></i>Boarding Points
+                    </div>
+                    <div class="card-body">
+                        @if (Model.BoardingPoints != null && Model.BoardingPoints.Any())
+                        {
+                            foreach (var point in Model.BoardingPoints)
+                            {
+                                <div class="boarding-point d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="point-time">@point.PickupTime</div>
+                                        <div class="point-address">
+                                            <strong>@point.Name</strong><br />
+                                            @point.Address
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <input type="radio" name="boardingPoint" value="@point.Id" class="form-check-input" />
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted mb-0">No boarding points available.</p>
+                        }
+                    </div>
+                </div>
+
+                <!-- Dropping Points -->
+                <div class="card detail-card">
+                    <div class="card-header">
+                        <i class="fas fa-arrow-down me-2 text-danger"></i>Dropping Points
+                    </div>
+                    <div class="card-body">
+                        @if (Model.DroppingPoints != null && Model.DroppingPoints.Any())
+                        {
+                            foreach (var point in Model.DroppingPoints)
+                            {
+                                <div class="boarding-point d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="point-time">@point.DropTime</div>
+                                        <div class="point-address">
+                                            <strong>@point.Name</strong><br />
+                                            @point.Address
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <input type="radio" name="droppingPoint" value="@point.Id" class="form-check-input" />
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted mb-0">No dropping points available.</p>
+                        }
+                    </div>
+                </div>
+
+                <!-- Amenities -->
+                <div class="card detail-card">
+                    <div class="card-header">
+                        <i class="fas fa-star me-2"></i>Amenities
+                    </div>
+                    <div class="card-body">
+                        @if (Model.Amenities != null && Model.Amenities.Any())
+                        {
+                            <div class="amenity-grid">
+                                @foreach (var amenity in Model.Amenities)
+                                {
+                                    <div class="amenity-item">
+                                        @switch (amenity.Name.ToLower())
+                                        {
+                                            case "wifi":
+                                                <i class="fas fa-wifi"></i>
+                                                break;
+                                            case "charging point":
+                                                <i class="fas fa-charging-station"></i>
+                                                break;
+                                            case "blanket":
+                                                <i class="fas fa-blanket"></i>
+                                                break;
+                                            case "water":
+                                                <i class="fas fa-tint"></i>
+                                                break;
+                                            case "reading light":
+                                                <i class="fas fa-lightbulb"></i>
+                                                break;
+                                            case "tracking":
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                break;
+                                            case "toilet":
+                                                <i class="fas fa-restroom"></i>
+                                                break;
+                                            case "snacks":
+                                                <i class="fas fa-utensils"></i>
+                                                break;
+                                            default:
+                                                <i class="fas fa-check-circle"></i>
+                                                break;
+                                        }
+                                        <span>@amenity.Name</span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted mb-0">No amenities information available.</p>
+                        }
+                    </div>
+                </div>
+
+                <!-- Seat Layout Placeholder -->
+                <div class="card detail-card">
+                    <div class="card-header">
+                        <i class="fas fa-chair me-2"></i>Seat Layout
+                    </div>
+                    <div class="card-body">
+                        <div class="seat-layout-placeholder" id="seat-layout-root">
+                            <i class="fas fa-couch"></i>
+                            <h5 class="fw-bold text-muted">Interactive Seat Selection</h5>
+                            <p class="text-muted small">Click "Select Seats" to view and choose your seats.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reviews Section -->
+                <div class="card detail-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-comments me-2"></i>Reviews (@Model.ReviewCount)</span>
+                        <button class="btn btn-outline-primary btn-sm" onclick="alert('Write a review')">
+                            <i class="fas fa-plus me-1"></i>Write Review
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <!-- Review Stats -->
+                        @if (Model.Reviews != null && Model.Reviews.Any())
+                        {
+                            <div class="row mb-4">
+                                <div class="col-md-4 text-center mb-3 mb-md-0">
+                                    <div style="font-size:3rem;font-weight:800;color:#1a1a2e;">@Model.Rating.ToString("F1")</div>
+                                    <div class="review-stars mb-1">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= Math.Floor(Model.Rating))
+                                            {
+                                                <i class="fas fa-star"></i>
+                                            }
+                                            else if (i == Math.Ceiling(Model.Rating) && Model.Rating % 1 >= 0.5)
+                                            {
+                                                <i class="fas fa-star-half-alt"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="far fa-star"></i>
+                                            }
+                                        }
+                                    </div>
+                                    <small class="text-muted">@Model.ReviewCount reviews</small>
+                                </div>
+                                <div class="col-md-8">
+                                    @if (Model.Reviews != null && Model.Reviews.Any())
+                                    {
+                                        for (int star = 5; star >= 1; star--)
+                                        {
+                                            var count = Model.Reviews.Count(r => r.Rating == star);
+                                            var pct = Model.ReviewCount > 0 ? (count * 100 / Model.ReviewCount) : 0;
+                                            <div class="rating-bar">
+                                                <span class="bar-label">@star <i class="fas fa-star" style="color:#ffc107;"></i></span>
+                                                <div class="progress">
+                                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@pct%"></div>
+                                                </div>
+                                                <span class="bar-count">@count</span>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Review List -->
+                        @if (Model.Reviews != null && Model.Reviews.Any())
+                        {
+                            foreach (var review in Model.Reviews)
+                            {
+                                <div class="review-card">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <span class="reviewer-name">@review.UserName</span>
+                                            <div class="review-stars mt-1">
+                                                @for (int i = 1; i <= 5; i++)
+                                                {
+                                                    if (i <= review.Rating)
+                                                    {
+                                                        <i class="fas fa-star"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="far fa-star"></i>
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                        <span class="review-date">@review.CreatedAt.ToString("dd MMM yyyy")</span>
+                                    </div>
+                                    <div class="review-text">@review.ReviewText</div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted mb-0 text-center py-3">No reviews yet. Be the first to review!</p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Fare Card -->
+                <div class="card detail-card">
+                    <div class="card-body">
+                        <div class="fare-card">
+                            <h6 class="fw-bold mb-0">Fare Details</h6>
+                            <div class="fare-amount mt-2">₹@Model.BaseFare.ToString("N0")</div>
+                            <small>per person (starting from)</small>
+                            <div class="fare-breakdown">
+                                <div class="row">
+                                    <div class="col-6">Base Fare</div>
+                                    <div class="col-6 text-end">₹@Model.BaseFare.ToString("N2")</div>
+                                </div>
+                                <hr style="border-color:rgba(255,255,255,0.3);">
+                                <div class="row fw-bold">
+                                    <div class="col-6">Total</div>
+                                    <div class="col-6 text-end">₹@Model.BaseFare.ToString("N2")</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span><i class="fas fa-chair text-success me-1"></i> Available Seats</span>
+                                <strong>@Model.AvailableSeats</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span><i class="fas fa-tachometer-alt text-primary me-1"></i> Bus Type</span>
+                                <strong>@(Model.IsAC ? "AC" : "Non-AC") @(Model.IsSleeper ? "Sleeper" : "Seater")</strong>
+                            </div>
+                        </div>
+                        <a href="@Url.Action("SelectSeats", "Booking", new { scheduleId = Model.ScheduleId })" class="btn btn-primary btn-select-seats w-100 mt-3">
+                            <i class="fas fa-chair me-2"></i>SELECT SEATS
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Info -->
+                <div class="card detail-card">
+                    <div class="card-header">
+                        <i class="fas fa-info-circle me-2"></i>Quick Info
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2">
+                                <i class="fas fa-clock text-primary me-2"></i>
+                                <strong>Duration:</strong> @(Model.DurationMinutes / 60)h @(Model.DurationMinutes % 60)m
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-calendar text-primary me-2"></i>
+                                <strong>Date:</strong> @Model.JourneyDate.ToString("dd MMM yyyy")
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-arrow-up text-success me-2"></i>
+                                <strong>Boarding:</strong> @(Model.BoardingPoints != null && Model.BoardingPoints.Any() ? Model.BoardingPoints.First().Name : "N/A")
+                            </li>
+                            <li>
+                                <i class="fas fa-arrow-down text-danger me-2"></i>
+                                <strong>Dropping:</strong> @(Model.DroppingPoints != null && Model.DroppingPoints.Any() ? Model.DroppingPoints.Last().Name : "N/A")
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Boarding/dropping point selection
+            $('input[name="boardingPoint"]').on('change', function () {
+                $('.boarding-point').removeClass('selected');
+                $(this).closest('.boarding-point').addClass('selected');
+            });
+
+            $('input[name="droppingPoint"]').on('change', function () {
+                $('.boarding-point').removeClass('selected');
+                $(this).closest('.boarding-point').addClass('selected');
+            });
+        });
+    </script>
+}

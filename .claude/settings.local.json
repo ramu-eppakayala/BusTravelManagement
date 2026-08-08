@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \"[System.Reflection.Assembly]::LoadFile\\('D:\\\\Openclaude\\\\Travels\\\\BusTravelManagement\\\\bin\\\\roslyn\\\\System.Threading.Tasks.Extensions.dll'\\).GetName\\(\\).Version.ToString\\(\\)\")",
+      "Bash(powershell -Command \"[System.Reflection.Assembly]::LoadFile\\('D:\\\\Openclaude\\\\Travels\\\\BusTravelManagement\\\\bin\\\\EntityFramework.dll'\\).GetName\\(\\).Version.ToString\\(\\)\")",
+      "Bash(powershell -Command \"[System.Reflection.Assembly]::LoadFile\\('D:\\\\Openclaude\\\\Travels\\\\BusTravelManagement\\\\bin\\\\System.Runtime.CompilerServices.Unsafe.dll'\\).GetName\\(\\).Version.ToString\\(\\)\")",
+      "Bash(powershell -Command \"Get-Content 'D:\\\\Openclaude\\\\Travels\\\\BusTravelManagement\\\\Security\\\\PasswordHelper.cs'\")",
+      "Bash(powershell -NoProfile -Command \"Get-Content 'D:\\\\Openclaude\\\\Travels\\\\BusTravelManagement\\\\Security\\\\PasswordHelper.cs' -Raw\")",
+      "Bash(powershell -NoProfile -Command \"Get-Content 'D:\\\\Openclaude\\\\Travels\\\\BusTravelManagement\\\\Database\\\\seed-data.sql' -Raw | Select-String -Pattern '\\(?i\\)\\(admin|IsEmailVerified|IsActive|IsLocked|password\\)' -AllMatches | ForEach-Object { \\\\$_.Matches } | Select-Object -First 30 Value\")",
+      "Bash(powershell -NoProfile -Command \"\n\\\\$p = Get-Content 'D:\\\\Openclaude\\\\Travels\\\\BusTravelManagement\\\\Security\\\\PasswordHelper.cs' -Raw\nWrite-Output \\\\$p\n\")",
+      "Bash(powershell -NoProfile -Command \"\n\\\\$s = Get-Content 'D:\\\\Openclaude\\\\Travels\\\\BusTravelManagement\\\\Database\\\\seed-data.sql'\n\\\\$s | Where-Object { \\\\$_ -match 'admin|INSERT INTO Users|IsEmailVerified|IsActive|IsLocked' } | Select-Object -First 30\n\")",
+      "Bash(powershell -NonInteractive -NoProfile -Command \"Get-Content 'D:\\\\Openclaude\\\\Travels\\\\BusTravelManagement\\\\Security\\\\PasswordHelper.cs' -Raw; Write-Host '==='; \\(Get-Content 'D:\\\\Openclaude\\\\Travels\\\\BusTravelManagement\\\\Database\\\\seed-data.sql'\\) -match '\\(admin|Users|IsEmailVerified|IsActive|password\\)' | Select -First 25\" 2>&1)",
+      "Bash(dir \"D:\\\\Openclaude\\\\Travels\\\\BusTravelManagement\\\\Security\")",
+      "Bash(dir \"D:\\\\Openclaude\\\\Travels\\\\BusTravelManagement\\\\Database\")"
+    ]
+  }
+}

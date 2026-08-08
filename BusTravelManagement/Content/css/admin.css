@@ -1,0 +1,70 @@
+/* =========== Admin Dashboard Styles =========== */
+
+.sidebar {
+    background: var(--gray-900);
+    min-height: calc(100vh - 72px);
+    color: white;
+    padding: 1rem 0;
+}
+.sidebar .nav-link {
+    color: rgba(255,255,255,0.7);
+    padding: 0.75rem 1.25rem;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.2s;
+}
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    color: white;
+    background: rgba(255,255,255,0.1);
+}
+.sidebar .nav-link i { width: 20px; text-align: center; }
+.sidebar .nav-section {
+    color: rgba(255,255,255,0.4);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 1rem 1.25rem 0.5rem;
+}
+
+.admin-header {
+    background: white;
+    padding: 1rem 1.5rem;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.chart-container {
+    background: white;
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
+}
+.chart-container canvas { max-height: 300px; }
+
+.admin-content { padding: 1.5rem; }
+
+.quick-actions { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.75rem; }
+.quick-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    background: white;
+    transition: all 0.2s;
+    text-align: center;
+}
+.quick-action-btn:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    color: var(--primary);
+}
+.quick-action-btn i { font-size: 1.5rem; margin-bottom: 0.5rem; }
+.quick-action-btn span { font-size: 0.8rem; font-weight: 500; }

@@ -1,0 +1,62 @@
+
+@model IEnumerable<BusTravelManagement.Models.ViewModels.AuditLogViewModel>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Audit Logs - BusTravel Management";
+}
+
+@section Styles {
+    <style>
+        .admin-section { padding: 2rem 0; background: #f8f9fa; min-height: calc(100vh - 76px - 250px); }
+        .admin-card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .admin-card .card-header { background: linear-gradient(135deg, #1a1a2e, #0f3460); color: #fff; border-radius: 12px 12px 0 0 !important; padding: 1.25rem 1.5rem; }
+        .admin-card .card-body { padding: 1.5rem; }
+        .table { margin: 0; }
+        .table th { border-top: none; color: #6c757d; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .log-entry { font-family: 'Consolas', 'Courier New', monospace; font-size: 0.85rem; }
+    </style>
+}
+
+<div class="admin-section">
+    <div class="container-fluid px-4">
+        <div class="card admin-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5><i class="fas fa-history me-2"></i>Audit Logs</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>User</th>
+                                <th>Action</th>
+                                <th>Entity</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var log in Model)
+                                {
+                                    <tr class="log-entry">
+                                        <td>@log.CreatedAt.ToString("dd MMM HH:mm:ss")</td>
+                                        <td>@log.UserName</td>
+                                        <td><span class="badge bg-secondary">@log.Action</span></td>
+                                        <td>@log.EntityType</td>
+                                        <td class="text-muted small">@log.IpAddress</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="5" class="text-center text-muted py-4">No audit logs available.</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
